@@ -46,7 +46,6 @@ fn validate_passports(passports: Vec<Vec<(String, String)>>) -> i32 {
     }
     if entries >= 7 {
       valid += 1;
-      entries = 0;
     }
   }
   return valid;
