@@ -43,10 +43,9 @@ fn get_group_answers (filepath: &str) -> Vec<HashMap<char, i32>> {
     if lin.len() == 0 {
       for derp in builder.clone() {
         for ch in derp.chars(){
-          let what = hm
-                              .entry(ch)
-                              .and_modify(|e| { *e += 1 })
-                              .or_insert(1);
+          hm.entry(ch)
+            .and_modify(|e| { *e += 1 })
+            .or_insert(1);
         }
 
       }
@@ -65,10 +64,9 @@ fn get_group_answers (filepath: &str) -> Vec<HashMap<char, i32>> {
   if builder.len() != 0 {
     for derp in builder.clone() {
       for ch in derp.chars(){
-        let what = hm
-                            .entry(ch)
-                            .and_modify(|e| { *e += 1 })
-                            .or_insert(1);
+       hm.entry(ch)
+          .and_modify(|e| { *e += 1 })
+          .or_insert(1);
       }
 
     }

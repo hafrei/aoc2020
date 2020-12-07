@@ -41,8 +41,8 @@ fn get_coords(passes: Vec<String>) -> Vec<(i32, i32)>{
   for c in passes {
     let mut max_row = 127;
     let mut max_col = 7;
-    let mut mid_row = 0;
-    let mut mid_col = 0;
+    let mut mid_row;
+    let mut mid_col;
     let mut min_row = 0;
     let mut min_col = 0;
     let mut ret_row = 0;
@@ -67,14 +67,6 @@ fn get_coords(passes: Vec<String>) -> Vec<(i32, i32)>{
       }
     }
     ret.push((ret_row, ret_col));
-    max_row = 127;
-    max_col = 7;
-    mid_row = 0;
-    mid_col = 0;
-    min_row = 0;
-    min_col = 0;
-    ret_row = 0;
-    ret_col = 0;
   }
   return ret;
 }
