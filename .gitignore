@@ -1,5 +1,6 @@
 /target
 /debug
 /input
+/.vscode
 
 Cargo.lock
