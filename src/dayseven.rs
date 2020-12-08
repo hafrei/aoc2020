@@ -2,7 +2,7 @@ use std::fs;
 use std::collections::HashMap;
 
 pub fn execute_dayseven() {
-  let path = "./input/day7test.txt";
+  let path = "./input/day7.txt";
   let target_bag = "shiny gold bag".to_string();
   let working = prepare_input(path);
   let structured: HashMap<String, HashMap<String, i32>> = parse_ruleset(working);
@@ -19,23 +19,39 @@ fn find_smaller_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag:
     For each bag, we need to get all the inner bags and their inner bags...
 
   */
-
   let mut hooks_in = true;
-  let mut focus_bag = target_bag;
+  let mut focus_bag = target_bag.clone();
   let mut working_list: Vec<String> = Vec::new();
-  let mut maybe_maybe = 0;
-  let mut count = 0;
+  let mut full_list: Vec<String> = Vec::new();
+
+  let bag_map_clone = bag_map.clone();
+  let mut bag_name: String = String::new();
+  let mut owned_inner: HashMap<String, i32> = HashMap::new();
 
   while hooks_in {
 
-    let (host_bag, inner_bags) = bag_map.clone().get_key_value(&focus_bag).unwrap();
+    let hum= bag_map_clone.get_key_value(&focus_bag);
+
+    match hum {
+      Some((bbs, oi)) => {
+        bag_name = String::from(bbs);
+        owned_inner = HashMap::from(oi.to_owned());
+      }
+      None => {bag_name = "none".to_string()}
+    }
     
-    for (bag, must_fit) in bag_map.clone() {
-      if bag.as_str().eq(focus_bag.as_str()){
-        working_list.push(bag.clone());
-        maybe_maybe += count;
-        println!("{:?}", bag,);
-        } 
+    for (bag, must_fit) in owned_inner.clone() {
+      if bag != "other bag".to_string() {
+        working_list.push(bag.clone());//llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+        for _x in 00..must_fit {
+          full_list.push(bag.clone());
+        }
+        if must_fit > 1 {
+          for _x in 00..must_fit-1 {
+            working_list.push(bag.clone());
+          }
+        }
+      }
     }
 
     if working_list.len() != 0 {
@@ -44,7 +60,7 @@ fn find_smaller_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag:
       hooks_in = false;
     }
   }
-  return maybe_maybe;
+  return full_list.len() as i32;
 }
 
 fn find_bigger_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag: String) -> i32{
