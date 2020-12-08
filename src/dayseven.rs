@@ -25,7 +25,7 @@ fn find_smaller_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag:
   let mut full_list: Vec<String> = Vec::new();
 
   let bag_map_clone = bag_map.clone();
-  let mut bag_name: String = String::new();
+  let mut _bag_name: String = String::new();
   let mut owned_inner: HashMap<String, i32> = HashMap::new();
 
   while hooks_in {
@@ -34,10 +34,10 @@ fn find_smaller_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag:
 
     match hum {
       Some((bbs, oi)) => {
-        bag_name = String::from(bbs);
+        _bag_name = String::from(bbs);
         owned_inner = HashMap::from(oi.to_owned());
       }
-      None => {bag_name = "none".to_string()}
+      None => {_bag_name = "none".to_string()}
     }
     
     for (bag, must_fit) in owned_inner.clone() {
