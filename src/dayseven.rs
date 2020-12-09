@@ -19,7 +19,6 @@ fn find_smaller_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag:
     For each bag, we need to get all the inner bags and their inner bags...
 
   */
-  let mut hooks_in = true;
   let mut focus_bag = target_bag.clone();
   let mut working_list: Vec<String> = Vec::new();
   let mut full_list: Vec<String> = Vec::new();
@@ -28,7 +27,7 @@ fn find_smaller_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag:
   let mut _bag_name: String = String::new();
   let mut owned_inner: HashMap<String, i32> = HashMap::new();
 
-  while hooks_in {
+  loop {
 
     let hum= bag_map_clone.get_key_value(&focus_bag);
 
@@ -57,18 +56,17 @@ fn find_smaller_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag:
     if working_list.len() != 0 {
       focus_bag = working_list.pop().unwrap();
     } else {
-      hooks_in = false;
+      break;
     }
   }
   return full_list.len() as i32;
 }
 
 fn find_bigger_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag: String) -> i32{
-  let mut hooks_in = true;
   let mut focus_bag = target_bag;
   let mut full_list: Vec<String> = Vec::new();
   let mut working_list: Vec<String> = Vec::new();
-  while hooks_in {
+  loop {
 
     for (bag, can_fit) in bag_map.clone() {
       for (ibag, _count) in can_fit {
@@ -82,7 +80,7 @@ fn find_bigger_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag: 
     if working_list.len() != 0 {
       focus_bag = working_list.pop().unwrap();
     } else {
-      hooks_in = false;
+      break;
     }
   }
 
