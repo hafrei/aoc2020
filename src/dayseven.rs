@@ -83,7 +83,7 @@ fn find_bigger_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag: 
       break;
     }
   }
-  
+
     full_list.sort(); 
     full_list.dedup(); //dedup only works if you sort first.
 
