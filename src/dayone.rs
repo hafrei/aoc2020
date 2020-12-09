@@ -17,18 +17,13 @@ fn get_triple(worklist: Vec<i32>) -> Vec<i32> {
 
   for x in worklist {
       for y in &working {
-          for z in &working {
-              if x.clone() + y.clone() + z.clone() == 2020 {
-                  the_triple.push(x.clone());
-                  the_triple.push(y.clone());
-                  the_triple.push(z.clone());
-                  breaker = true;
-              }
-              if breaker {
-                break;
-              }
-          }
-        if breaker {
+        let target:i32 = 2020 - x - y;
+
+        if working.contains(&target){
+          the_triple.push(x);
+          the_triple.push(*y);
+          the_triple.push(target);
+          breaker = true;
           break;
         }
       }
@@ -41,24 +36,16 @@ fn get_triple(worklist: Vec<i32>) -> Vec<i32> {
 }
 
 fn get_pair(worklist: Vec<i32>) -> Vec<i32> {
-  let mut breaker = false;
   let working: Vec<i32> = worklist.clone();
   let mut the_pair: Vec<i32> = Vec::new();
 
   for x in worklist {
-      for y in &working {
-          if x.clone() + y.clone() == 2020 {
-              the_pair.push(x.clone());
-              the_pair.push(y.clone());
-              breaker = true;
-          }
-        if breaker {
-          break;
-        }
-      } 
-    if breaker {
-      break;
-    }  
+    let target = 2020 - x;
+     if working.contains(&target) {
+       the_pair.push(x);
+       the_pair.push(target);
+       break;
+     };
   }
   return the_pair;
 }

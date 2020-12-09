@@ -47,8 +47,8 @@ fn get_group_answers (filepath: &str) -> Vec<HashMap<char, i32>> {
             .and_modify(|e| { *e += 1 })
             .or_insert(1);
         }
-
       }
+      
       let leng = "#".chars().next().unwrap();
       let what2 = builder.len() as i32;
       hm.entry(leng).or_insert(what2);

@@ -83,14 +83,9 @@ fn find_bigger_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag: 
       break;
     }
   }
-
-  //Can you search by value?
-    //if so, get all they keys which list shiny gold bag as value
-    //build a list/set for immediately larger
-    // build a list/set for everything (that has a len())
-    //return that
-    full_list.sort();
-    full_list.dedup();
+  
+    full_list.sort(); 
+    full_list.dedup(); //dedup only works if you sort first.
 
     return full_list.len() as i32;
 }
