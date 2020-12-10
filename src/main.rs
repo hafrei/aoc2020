@@ -7,6 +7,7 @@ mod daysix;
 mod dayseven;
 mod dayeight;
 mod dayten;
+mod daynine;
 use {
     dayone::execute_dayone,
     daytwo::execute_daytwo,
@@ -16,6 +17,7 @@ use {
     daysix::execute_daysix,
     dayseven::execute_dayseven,
     dayeight::execute_day_eight,
+    daynine::execute_day_nine,
     dayten::execute_dayten
     };
 use std::time::SystemTime;
@@ -44,6 +46,9 @@ fn main() {
     runtime(start);
     let start = SystemTime::now();
     execute_day_eight();
+    runtime(start);
+    let start = SystemTime::now();
+    execute_day_nine();
     runtime(start);
     let start = SystemTime::now();
     execute_dayten();
