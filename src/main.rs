@@ -16,8 +16,8 @@ use {
     dayfive::execute_dayfive,
     daysix::execute_daysix,
     dayseven::execute_dayseven,
-    dayeight::execute_day_eight,
-    daynine::execute_day_nine,
+    dayeight::execute_dayeight,
+    daynine::execute_daynine,
     dayten::execute_dayten
     };
 use std::time::SystemTime;
@@ -45,10 +45,10 @@ fn main() {
     execute_dayseven();
     runtime(start);
     let start = SystemTime::now();
-    execute_day_eight();
+    execute_dayeight();
     runtime(start);
     let start = SystemTime::now();
-    execute_day_nine();
+    execute_daynine();
     runtime(start);
     let start = SystemTime::now();
     execute_dayten();

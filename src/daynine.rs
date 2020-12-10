@@ -17,7 +17,7 @@ impl XmasStream {
   }
 }
 
-pub fn execute_day_nine() { 
+pub fn execute_daynine() { 
   let path = "./input/day9.txt";
   let preamble: usize = 25;
   let working = prepare_input(path);

@@ -19,7 +19,7 @@ impl Register {
   }
 }
 
-pub fn execute_day_eight(){
+pub fn execute_dayeight(){
   let path = "./input/day8.txt";
   let working = build_sequence(prepare_input(path));
   let (accumulator_after_one, visited_registers) = run_sequence_once(working.clone());
