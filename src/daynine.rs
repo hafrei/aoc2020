@@ -24,18 +24,42 @@ pub fn execute_day_nine() {
   let weak_point = find_weakness(working.clone(), preamble);
   println!("Use {} to attack for massive damage!", weak_point);
   let exploit_sum = exploit_weakness(working, preamble, weak_point);
+  println!("The end is at {}", exploit_sum);
 }
 
 fn exploit_weakness(working: Vec<XmasStream>, preamble: usize, weak_point: i64) -> i64 {
-  let exploit_sum = 0;
-  let target_point = weak_point;
+  let mut exploit_sum = 0;
   let mut preamble_start: usize = 0;
   let mut preamble_end: usize = preamble;
-  let mut w_copy = working;
-  let mut p_work: Vec<XmasStream> = Vec::new();
+  let mut _w_copy = working;
+  let mut _p_work: Vec<XmasStream> = Vec::new();
 
   while exploit_sum == 0 {
+    _p_work = _w_copy[preamble_start..preamble_end].to_vec().clone();
 
+    for i in 0.._p_work.len() {
+      let mut weak_combo: Vec<usize> = Vec::new();
+      let mut work_sum = _p_work[i].value;
+      for j in 0.._p_work.len() {
+        if work_sum < weak_point {
+          work_sum += _p_work[j].value;
+          weak_combo.push(_p_work[j].value as usize);
+        } else if work_sum > weak_point {
+          work_sum = 0;
+          weak_combo = Vec::new();
+          break;
+        } else if work_sum == weak_point {
+          weak_combo.sort();
+          exploit_sum = weak_combo[0] as i64 + weak_combo[weak_combo.len()-1] as i64;
+          break;
+        }
+      }
+      if exploit_sum > 0 || work_sum > weak_point {
+        break;
+      }
+    }
+    preamble_start += 1;
+    preamble_end += 1;
   }
 
   return exploit_sum;
