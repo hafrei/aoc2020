@@ -46,7 +46,6 @@ fn exploit_weakness(working: Vec<XmasStream>, preamble: usize, weak_point: i64) 
           weak_combo.push(_p_work[j].value as usize);
         } else if work_sum > weak_point {
           work_sum = 0;
-          weak_combo = Vec::new();
           break;
         } else if work_sum == weak_point {
           weak_combo.sort();

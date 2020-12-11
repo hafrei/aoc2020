@@ -2,10 +2,13 @@ use std::fs;
 
 pub fn execute_dayten() {
   let path = "./input/day10.txt";
-  let working = prepare_input(path);
+  let mut working: Vec<i32> = prepare_input(path);
+  let eff_you: Vec<i32> = working.clone();
+  let (one, three) = kinda_cheeky(eff_you);
   not_silly(working.clone());
-  let haha_what = oh_no(working);
+  let haha_what = oh_no(working.clone());
   println!("If this isn't 0 then it worked: {}", haha_what);
+  println!("Should be {} * {} = {}", one, three, one * three );
 }
 
 /*
@@ -16,8 +19,38 @@ pub fn execute_dayten() {
     for each option
  */
 
- fn not_silly(really: Vec<i32>) {
+ fn kinda_cheeky(worklist: Vec<i32>) -> (i32, i32){ //2170 too low 6300 too high
+   let mut workan: Vec<i32> = Vec::new();
+   let mut come_on: Vec<i32> = Vec::new();
+   workan = worklist.clone();
+   workan.sort();
+   let mut one = 0;
+   let mut three = 0;
 
+   for (e, &x) in workan.iter().enumerate() {
+     come_on = workan.clone();
+     let fine: usize = e.clone()+1;
+     if fine >= workan.len() {
+       break;
+     }
+     let okay: i32 = come_on[fine];
+     if okay - x == 1 {
+       one +=1;
+     } else if okay - x == 2 {
+      println!("Sommin");
+     }
+     else if okay - x == 3{
+      three +=1;
+     } else {
+       println!("a broke?");
+     }
+   }
+   three += 1; //Cause your laptop!
+
+   return (one as i32, three as i32);
+ }
+
+ fn not_silly(really: Vec<i32>) {
   let mut for_really = really.clone();
   println!("for_really is {} long", for_really.len());
   // This magic line gets the maximum value from an array.
@@ -29,6 +62,7 @@ pub fn execute_dayten() {
   let claim = for_really.remove(lives_at);
   println!("{} lived at {}, now for_really is {}", claim, lives_at, for_really.len());
 
+  for_really = really.clone();
  }
 
 fn oh_no(lol: Vec<i32>) -> i32 {
