@@ -4,7 +4,7 @@ pub fn execute_dayfive(){
   let path = "./input/day5.txt";
   let boarding_passes = prepare_input(path);
   let coords: Vec<(i32, i32)> = get_coords(boarding_passes);
-  let (the_greatest, seat) = get_greatest(coords.clone());
+  let (the_greatest, seat) = get_greatest(coords);
   println!("Greatest seat should be {}", the_greatest);
   println!("Your seat ID is {}", seat);
 }
@@ -22,7 +22,7 @@ fn get_greatest(coords: Vec<(i32, i32)>) -> (i32, i32) {
     ids.push(x);
   }
 
-  ids.sort();
+  ids.sort_unstable();
   let mut starter = ids[0];
 
   for id in ids {
@@ -33,7 +33,7 @@ fn get_greatest(coords: Vec<(i32, i32)>) -> (i32, i32) {
     starter += 1;
   }
 
-  return (the_greatest, your_seat);
+  (the_greatest, your_seat)
 }
 
 fn get_coords(passes: Vec<String>) -> Vec<(i32, i32)>{
@@ -68,7 +68,7 @@ fn get_coords(passes: Vec<String>) -> Vec<(i32, i32)>{
     }
     ret.push((ret_row, ret_col));
   }
-  return ret;
+  ret
 }
 
 fn prepare_input (filepath: &str) -> Vec<String> {
@@ -78,5 +78,5 @@ fn prepare_input (filepath: &str) -> Vec<String> {
   for lin in list.lines() {
     ret.push(lin.to_string().clone());
   }
-  return ret;
+  ret
 }

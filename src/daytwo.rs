@@ -23,12 +23,12 @@ fn process_input_again(pws_and_rules: Vec<PwHandle>) -> u16 {
   for pw in pws_and_rules {
       let min_op: usize = pw.pw_min as usize - 1; 
       let max_op: usize = pw.pw_max as usize - 1; 
-      if (pw.pw.chars().nth(min_op) == pw.c.chars().nth(0)) //HAHA oh wow pw.c.chars().nth(0)
-          ^ (pw.pw.chars().nth(max_op)== pw.c.chars().nth(0)) {
+      if (pw.pw.chars().nth(min_op) == pw.c.chars().next()) //HAHA oh wow pw.c.chars().nth(0)
+          ^ (pw.pw.chars().nth(max_op)== pw.c.chars().next()) {
           valid_tally += 1;
       }
   }
-  return valid_tally;
+  valid_tally
 }
 
 fn process_input(pws_and_rules: Vec<PwHandle>) -> u16 {
@@ -41,7 +41,7 @@ fn process_input(pws_and_rules: Vec<PwHandle>) -> u16 {
           valid_tally += 1;
       }
   }
-  return valid_tally;
+  valid_tally
 }
 
 fn prepare_input(filepath: &str) -> Vec<PwHandle> {
@@ -50,15 +50,15 @@ fn prepare_input(filepath: &str) -> Vec<PwHandle> {
   
   //#LifetimesAbuse
   for lin in list.lines() {
-      let v: Vec<&str> = lin.clone().split(":").collect();
-      let left_side: Vec<&str> = v[0].split(" ").collect();
-      let specs: Vec<&str> = left_side[0].split("-").collect();
+      let v: Vec<&str> = lin.split(':').collect();
+      let left_side: Vec<&str> = v[0].split(' ').collect();
+      let specs: Vec<&str> = left_side[0].split('-').collect();
       ret.push(PwHandle {
-          pw_max: specs[1].parse::<u8>().unwrap().clone(), 
-          pw_min: specs[0].parse::<u8>().unwrap().clone(),
+          pw_max: specs[1].parse::<u8>().unwrap(), 
+          pw_min: specs[0].parse::<u8>().unwrap(),
           c: left_side[1].to_string().clone(),
           pw: v[1].trim().to_string().clone(),
        } )
   }
-  return ret;
+  ret
 }

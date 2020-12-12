@@ -19,11 +19,11 @@ fn find_smaller_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag:
     For each bag, we need to get all the inner bags and their inner bags...
 
   */
-  let mut focus_bag = target_bag.clone();
+  let mut focus_bag = target_bag;
   let mut working_list: Vec<String> = Vec::new();
   let mut full_list: Vec<String> = Vec::new();
 
-  let bag_map_clone = bag_map.clone();
+  let bag_map_clone = bag_map;
   let mut _bag_name: String = String::new();
   let mut owned_inner: HashMap<String, i32> = HashMap::new();
 
@@ -34,13 +34,13 @@ fn find_smaller_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag:
     match hum {
       Some((bbs, oi)) => {
         _bag_name = String::from(bbs);
-        owned_inner = HashMap::from(oi.to_owned());
+        owned_inner = oi.to_owned();
       }
       None => {_bag_name = "none".to_string()}
     }
     
     for (bag, must_fit) in owned_inner.clone() {
-      if bag != "other bag".to_string() {
+      if bag != *"other bag" {
         working_list.push(bag.clone());//llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
         for _x in 00..must_fit {
           full_list.push(bag.clone());
@@ -53,13 +53,13 @@ fn find_smaller_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag:
       }
     }
 
-    if working_list.len() != 0 {
+    if !working_list.is_empty() {
       focus_bag = working_list.pop().unwrap();
     } else {
       break;
     }
   }
-  return full_list.len() as i32;
+  full_list.len() as i32
 }
 
 fn find_bigger_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag: String) -> i32{
@@ -77,7 +77,7 @@ fn find_bigger_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag: 
       }
     }
 
-    if working_list.len() != 0 {
+    if !working_list.is_empty() {
       focus_bag = working_list.pop().unwrap();
     } else {
       break;
@@ -87,7 +87,7 @@ fn find_bigger_bags(bag_map: HashMap<String, HashMap<String, i32>>, target_bag: 
     full_list.sort(); 
     full_list.dedup(); //dedup only works if you sort first.
 
-    return full_list.len() as i32;
+  full_list.len() as i32
 }
 
 fn parse_ruleset(raw_set: Vec<String>) -> HashMap<String, HashMap<String, i32>> {
@@ -108,11 +108,11 @@ fn parse_ruleset(raw_set: Vec<String>) -> HashMap<String, HashMap<String, i32>> 
       con.retain(|c| c != '.');
       //of these, parse at first space
         //left is number of bags
-      let mut desc = con.split_off(con.find(" ").unwrap()).trim().to_string();
+      let mut desc = con.split_off(con.find(' ').unwrap()).trim().to_string();
       //trim and remove the final character if it's 's' or '.'
       desc = desc.replace("bags", "bag");
       // no is the same as 0 and I want an i32 for later
-      if con == "no".to_string() {
+      if con == *"no" {
         con = "0".to_string();
       }
       inners.insert(desc, con.parse::<i32>().unwrap());
@@ -120,7 +120,7 @@ fn parse_ruleset(raw_set: Vec<String>) -> HashMap<String, HashMap<String, i32>> 
     parsed_set.insert(working, inners);
   }
   //HashMap<ContainingBag, HashMap<InnerBag, count>>
-  return parsed_set;
+  parsed_set
 }
 
 fn prepare_input (filepath: &str) -> Vec<String> {
@@ -130,5 +130,5 @@ fn prepare_input (filepath: &str) -> Vec<String> {
   for lin in list.lines() {
     ret.push(lin.to_string().clone());
   }
-  return ret;
+  ret
 }

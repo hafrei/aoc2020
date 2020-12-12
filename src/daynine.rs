@@ -37,18 +37,18 @@ fn exploit_weakness(working: Vec<XmasStream>, preamble: usize, weak_point: i64) 
   while exploit_sum == 0 {
     _p_work = _w_copy[preamble_start..preamble_end].to_vec().clone();
 
-    for i in 0.._p_work.len() {
+    for i in &_p_work {
       let mut weak_combo: Vec<usize> = Vec::new();
-      let mut work_sum = _p_work[i].value;
-      for j in 0.._p_work.len() {
+      let mut work_sum = i.value;
+      for j in &_p_work {
         if work_sum < weak_point {
-          work_sum += _p_work[j].value;
-          weak_combo.push(_p_work[j].value as usize);
+          work_sum += j.value;
+          weak_combo.push(j.value as usize);
         } else if work_sum > weak_point {
           work_sum = 0;
           break;
         } else if work_sum == weak_point {
-          weak_combo.sort();
+          weak_combo.sort_unstable();
           exploit_sum = weak_combo[0] as i64 + weak_combo[weak_combo.len()-1] as i64;
           break;
         }
@@ -61,7 +61,7 @@ fn exploit_weakness(working: Vec<XmasStream>, preamble: usize, weak_point: i64) 
     preamble_end += 1;
   }
 
-  return exploit_sum;
+  exploit_sum
 }
 
 fn find_weakness(working: Vec<XmasStream>, preamble: usize) -> i64{
@@ -99,7 +99,7 @@ fn find_weakness(working: Vec<XmasStream>, preamble: usize) -> i64{
     preamble_end += 1;
   }
 
-  return weak_point;
+  weak_point
 }
 
 fn prepare_input (filepath: &str) -> Vec<XmasStream> {
@@ -109,5 +109,5 @@ fn prepare_input (filepath: &str) -> Vec<XmasStream> {
   for lin in list.lines() {
     ret.push(XmasStream::new(lin.parse::<i64>().unwrap(), ret.len()));
   }
-  return ret;
+  ret
 }

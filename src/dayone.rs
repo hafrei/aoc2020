@@ -4,7 +4,7 @@ pub fn execute_dayone() { //344ms
   let path = "./input/day1.txt";
   let base: Vec<i32> = read_and_parse_file(path);
   let pair: Vec<i32> = get_pair(base.clone());
-  let triple: Vec<i32> = get_triple(base.clone());
+  let triple: Vec<i32> = get_triple(base);
 
   println!("Pooped out a {} for pair", pair_multi(pair[0], pair[1]));
   println!("Pooped out a {} for multi", trip_multi(triple[0], triple[1], triple[2]));
@@ -32,7 +32,7 @@ fn get_triple(worklist: Vec<i32>) -> Vec<i32> {
     }
   }
 
-  return the_triple;
+  the_triple
 }
 
 fn get_pair(worklist: Vec<i32>) -> Vec<i32> {
@@ -47,7 +47,7 @@ fn get_pair(worklist: Vec<i32>) -> Vec<i32> {
        break;
      };
   }
-  return the_pair;
+  the_pair
 }
 
 fn read_and_parse_file(path: &str) -> Vec<i32> {
@@ -56,16 +56,16 @@ fn read_and_parse_file(path: &str) -> Vec<i32> {
   let list = fs::read_to_string(path).expect("Well that sure didn't open");
   
   for lin in list.lines() {
-      extract.push(lin.parse::<i32>().unwrap().clone());
+      extract.push(lin.parse::<i32>().unwrap());
   }
 
-  return extract;
+  extract
 }
 
 fn pair_multi(x: i32, y: i32) -> i32 {
-  return x * y;
+  x * y
 }
 
 fn trip_multi(x: i32, y: i32, z: i32) -> i32 {
-  return x * y * z;
+  x * y * z
 }

@@ -31,7 +31,7 @@ fn validate_passports(passports: Vec<Vec<(String, String)>>) -> i32 {
 
   for pp in passports {
     let mut entries = 0;
-    let scanner: Vec<(String, String)> = Vec::from(pp);
+    let scanner: Vec<(String, String)> = pp;
     for (piece1, piece2) in scanner.clone() {
       if (piece1.as_str().eq(byr) && year_re.is_match(piece2.as_str()))
       || (piece1.as_str().eq(iyr) && iyear_re.is_match(piece2.as_str()))
@@ -48,44 +48,44 @@ fn validate_passports(passports: Vec<Vec<(String, String)>>) -> i32 {
       valid += 1;
     }
   }
-  return valid;
+  valid
 }
 
-fn build_passports(passports: &Vec<String>) -> Vec<Vec<(String, String)>> {
+fn build_passports(passports: &[String]) -> Vec<Vec<(String, String)>> {
   let mut actually: Vec<Vec<(String, String)>> = Vec::new();
 
   for x in passports {
     let mut working_passports: Vec<(String, String)> = Vec::new();
-    let mut pp_fields: Vec<String> = x.clone().split(" ").map(String::from).collect();
+    let mut pp_fields: Vec<String> = x.clone().split(' ').map(String::from).collect();
     pp_fields.sort();
     for y in pp_fields {
-      let left_side: Vec<String> = y.clone().split(":").map(String::from).collect();
+      let left_side: Vec<String> = y.clone().split(':').map(String::from).collect();
       working_passports.push((left_side[0].clone(), left_side[1].clone()));
     }
     actually.push(working_passports.clone());
   }
 
-  return actually;
+  actually
 }
 
-fn build_passenger_info(input: &Vec<String>) -> Vec<String> {
+fn build_passenger_info(input: &[String]) -> Vec<String> {
   let mut builder: Vec<String> = Vec::new();
   let mut validate: String = String::new();
 
-  for x in input.clone(){
-    if x.len() == 0{
+  for x in input{
+    if x.is_empty(){
       builder.push(validate.trim().to_string());
       validate = String::new();
     } else {
-      validate.push_str(" ");
+      validate.push(' ');
       validate.push_str(&x);
     }
   }
 
-  if validate.len() != 0{
+  if validate.is_empty() {
     builder.push(validate.trim().to_string());
   }
-  return builder;
+  builder
 }
 
 fn prepare_input (filepath: &str) -> Vec<String> {
@@ -95,5 +95,5 @@ fn prepare_input (filepath: &str) -> Vec<String> {
   for lin in list.lines() {
     ret.push(lin.to_string().clone());
   }
-  return ret;
+  ret
 }
