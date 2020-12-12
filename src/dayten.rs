@@ -1,7 +1,7 @@
 use std::fs;
 
 pub fn execute_dayten() {
-  let path = "./input/day10.txt";
+  let path = "./input/day10test1.txt";
   let mut working: Vec<i32> = prepare_input(path);
   let eff_you: Vec<i32> = working.clone();
   let (one, three) = kinda_cheeky(eff_you);
