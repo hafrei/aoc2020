@@ -1,4 +1,5 @@
 use std::fs;
+use std::cmp::Ordering;
 
 #[derive(Clone)]
 struct XmasStream {
@@ -39,29 +40,30 @@ fn exploit_weakness(working: Vec<XmasStream>, preamble: usize, weak_point: i64) 
 
     for i in &_p_work {
       let mut weak_combo: Vec<usize> = Vec::new();
-      let mut work_sum = i.value;
+      let mut _work_sum = i.value;
+      weak_combo.push(i.value as usize);
       for j in &_p_work {
-        if work_sum < weak_point {
-          work_sum += j.value;
-          weak_combo.push(j.value as usize);
-        } else if work_sum > weak_point {
-          work_sum = 0;
-          break;
-        } else if work_sum == weak_point {
-          weak_combo.sort_unstable();
-          exploit_sum = weak_combo[0] as i64 + weak_combo[weak_combo.len()-1] as i64;
-          break;
+        match _work_sum.cmp(&weak_point) {
+          Ordering::Less => {
+            _work_sum += j.value;
+            weak_combo.push(j.value as usize);
+          }
+          Ordering::Equal => {
+            weak_combo.sort_unstable();
+            exploit_sum = weak_combo.first().unwrap() + weak_combo.last().unwrap();
+            break;
+          }
+          Ordering::Greater => {
+            _work_sum = 0;
+            break;
+          }
         }
       }
-      if exploit_sum > 0 || work_sum > weak_point {
-        break;
-      }
-    }
     preamble_start += 1;
     preamble_end += 1;
+    }
   }
-
-  exploit_sum
+  exploit_sum as i64
 }
 
 fn find_weakness(working: Vec<XmasStream>, preamble: usize) -> i64{
