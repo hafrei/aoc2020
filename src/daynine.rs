@@ -42,6 +42,7 @@ fn exploit_weakness(working: Vec<XmasStream>, preamble: usize, weak_point: i64) 
       let mut weak_combo: Vec<usize> = Vec::new();
       let mut _work_sum = i.value;
       weak_combo.push(i.value as usize);
+
       for j in &_p_work {
         match _work_sum.cmp(&weak_point) {
           Ordering::Less => {
@@ -49,7 +50,7 @@ fn exploit_weakness(working: Vec<XmasStream>, preamble: usize, weak_point: i64) 
             weak_combo.push(j.value as usize);
           }
           Ordering::Equal => {
-            weak_combo.sort_unstable();
+            weak_combo.sort_unstable(); // You want 43434797 (lives at 548) and 86009758 (lives at 562)
             exploit_sum = weak_combo.first().unwrap() + weak_combo.last().unwrap();
             break;
           }
@@ -59,9 +60,9 @@ fn exploit_weakness(working: Vec<XmasStream>, preamble: usize, weak_point: i64) 
           }
         }
       }
+    }
     preamble_start += 1;
     preamble_end += 1;
-    }
   }
   exploit_sum as i64
 }
