@@ -2,11 +2,11 @@ use std::fs;
 
 pub fn execute_dayten() {
   let path = "./input/day10.txt";
-  let mut working: Vec<i32> = prepare_input(path);
+  let working: Vec<i32> = prepare_input(path);
   let eff_you: Vec<i32> = working.clone();
   let (one, three) = kinda_cheeky(eff_you);
   not_silly(working.clone());
-  let haha_what = oh_no(working.clone());
+  let haha_what = oh_no(working);
   println!("If this isn't 0 then it worked: {}", haha_what);
   println!("Should be {} * {} = {}", one, three, one * three );
 }
@@ -22,14 +22,14 @@ pub fn execute_dayten() {
  fn kinda_cheeky(worklist: Vec<i32>) -> (i32, i32){ //2170 too low 6300 too high
    let mut workan: Vec<i32> = Vec::new();
    let mut come_on: Vec<i32> = Vec::new();
-   workan = worklist.clone();
-   workan.sort();
+   workan = worklist;
+   workan.sort_unstable();
    let mut one = 0;
    let mut three = 0;
 
    for (e, &x) in workan.iter().enumerate() {
      come_on = workan.clone();
-     let fine: usize = e.clone()+1;
+     let fine: usize = e+1;
      if fine >= workan.len() {
        break;
      }
@@ -47,7 +47,7 @@ pub fn execute_dayten() {
    }
    three += 1; //Cause your laptop!
 
-   return (one as i32, three as i32);
+   (one as i32, three as i32)
  }
 
  fn not_silly(really: Vec<i32>) {
@@ -69,12 +69,12 @@ fn oh_no(lol: Vec<i32>) -> i32 {
   let mut ret = 0;
   let mut hahaha = lol.clone();
 
-  if lol.len() != 0 {
+  if lol.is_empty(){
     ret += hahaha.remove(0);
     ret += oh_no(hahaha);
   }
 
-  return ret;
+  ret
 }
 
 fn prepare_input (filepath: &str) -> Vec<i32> {
@@ -84,5 +84,5 @@ fn prepare_input (filepath: &str) -> Vec<i32> {
   for lin in list.lines() {
     ret.push(lin.parse::<i32>().unwrap());
   }
-  return ret;
+  ret
 }
