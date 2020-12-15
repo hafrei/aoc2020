@@ -2,18 +2,20 @@ use std::fs;
 use itertools::Itertools;
 
 
-
 pub fn execute_dayten() {
   let path = "./input/day10.txt";
   let working: Vec<i32> = prepare_input(path);
   let (one, three) = kinda_cheeky(working.clone());
-  let perms = get_permutations(working);
   println!("Should be {} * {} = {}", one, three, one * three );
+
+  let perms = get_permutations(working);
 }
 
 fn get_permutations(full_list: Vec<i32>) -> i64{
   let mut perms = 0;
   let mut distances: Vec<i32> = Vec::new();
+
+
 
   perms
 }
@@ -61,12 +63,14 @@ fn get_permutations(full_list: Vec<i32>) -> i64{
    (one as i32, three as i32)
  }
 
+//Thanks, fasterthanlime!
 fn prepare_input (filepath: &str) -> Vec<i32> {
-  let mut ret: Vec<i32> = Vec::new();
   let list = fs::read_to_string(filepath).expect("Yeah, that's not a file");
-
-  for lin in list.lines() {
-    ret.push(lin.parse::<i32>().unwrap());
-  }
+  let ret = list
+                      .as_str()
+                      .split('\n')
+                      .map(str::parse::<i32>)
+                      .map(Result::unwrap)
+                      .collect();
   ret
 }
