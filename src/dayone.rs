@@ -50,16 +50,15 @@ fn get_pair(worklist: Vec<i32>) -> Vec<i32> {
   the_pair
 }
 
-fn read_and_parse_file(path: &str) -> Vec<i32> {
-  let mut extract: Vec<i32> = Vec::new();
-  //Day 1: Find the two entries that sum to 2020; what do you get if you multiply them together?
-  let list = fs::read_to_string(path).expect("Well that sure didn't open");
-  
-  for lin in list.lines() {
-      extract.push(lin.parse::<i32>().unwrap());
-  }
-
-  extract
+fn read_and_parse_file (filepath: &str) -> Vec<i32> {
+  let list = fs::read_to_string(filepath).expect("Yeah, that's not a file");
+  let ret = list
+                      .as_str()
+                      .split('\n')
+                      .map(str::parse::<i32>)
+                      .map(Result::unwrap)
+                      .collect();
+  ret
 }
 
 fn pair_multi(x: i32, y: i32) -> i32 {

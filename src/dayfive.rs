@@ -72,11 +72,12 @@ fn get_coords(passes: Vec<String>) -> Vec<(i32, i32)>{
 }
 
 fn prepare_input (filepath: &str) -> Vec<String> {
-  let mut ret: Vec<String> = Vec::new();
   let list = fs::read_to_string(filepath).expect("Yeah, that's not a file");
-
-  for lin in list.lines() {
-    ret.push(lin.to_string().clone());
-  }
+  let ret = list
+                      .as_str()
+                      .split('\n')
+                      .map(str::parse::<String>)
+                      .map(Result::unwrap)
+                      .collect();
   ret
 }

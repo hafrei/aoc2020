@@ -43,11 +43,12 @@ fn get_treecount(tree_plane: &[String], trajectory: u16, skip: i32) -> u16 {
 }
 
 fn prepare_input (filepath: &str) -> Vec<String> {
-  let mut ret: Vec<String> = Vec::new();
   let list = fs::read_to_string(filepath).expect("Yeah, that's not a file");
-
-  for lin in list.lines() {
-    ret.push(lin.to_string().clone());
-  }
+  let ret = list
+                      .as_str()
+                      .split('\n')
+                      .map(str::parse::<String>)
+                      .map(Result::unwrap)
+                      .collect();
   ret
 }

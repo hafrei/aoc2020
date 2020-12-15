@@ -55,6 +55,9 @@ fn build_passports(passports: &[String]) -> Vec<Vec<(String, String)>> {
   let mut actually: Vec<Vec<(String, String)>> = Vec::new();
 
   for x in passports {
+    if x.is_empty(){
+      break;
+    }
     let mut working_passports: Vec<(String, String)> = Vec::new();
     let mut pp_fields: Vec<String> = x.clone().split(' ').map(String::from).collect();
     pp_fields.sort();
@@ -89,11 +92,12 @@ fn build_passenger_info(input: &[String]) -> Vec<String> {
 }
 
 fn prepare_input (filepath: &str) -> Vec<String> {
-  let mut ret: Vec<String> = Vec::new();
   let list = fs::read_to_string(filepath).expect("Yeah, that's not a file");
-
-  for lin in list.lines() {
-    ret.push(lin.to_string().clone());
-  }
+  let ret = list
+                      .as_str()
+                      .split('\n')
+                      .map(str::parse::<String>)
+                      .map(Result::unwrap)
+                      .collect();
   ret
 }
