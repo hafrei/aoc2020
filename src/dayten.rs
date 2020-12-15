@@ -9,6 +9,7 @@ pub fn execute_dayten() {
   println!("Should be {} * {} = {}", one, three, one * three );
 
   let perms = get_permutations(working);
+  println!("There's {} permutations", perms);
 }
 
 fn get_permutations(full_list: Vec<i32>) -> i64{
@@ -33,15 +34,13 @@ fn get_permutations(full_list: Vec<i32>) -> i64{
  */
 
  fn kinda_cheeky(worklist: Vec<i32>) -> (i32, i32){ //2170 too low 6300 too high
-   let mut workan: Vec<i32> = Vec::new();
-   let mut come_on: Vec<i32> = Vec::new();
-   workan = worklist;
+   let mut workan: Vec<i32> = worklist;
    workan.sort_unstable();
    let mut one = 0;
    let mut three = 0;
 
    for (e, &x) in workan.iter().enumerate() {
-     come_on = workan.clone();
+    let come_on: Vec<i32>  = workan.clone();
      let fine: usize = e+1;
      if fine >= workan.len() {
        break;
