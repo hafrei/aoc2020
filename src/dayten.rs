@@ -13,12 +13,30 @@ pub fn execute_dayten() {
 }
 
 fn get_permutations(full_list: Vec<i32>) -> i64{
-  let mut perms = 0;
-  let mut distances: Vec<i32> = Vec::new();
+  let mut ones = 0;
+  let mut twos = 0;
+  let mut threes = 0;
 
+  for (e, &x) in full_list.iter().enumerate() {
+    let i_target: usize = e+1;
+    if i_target >= full_list.len() {
+      break;
+    }
+    let target: i32 = full_list[i_target];
+    if target - x == 1 {
+      ones +=1;
+    } 
+    if target - x == 2 {
+      twos += 1;
+    }
+    if target - x == 3{
+      threes +=1;
+    } else {
+      println!("Oh man, not sure how we got here");
+    }
+  }
 
-
-  perms
+  ones * twos * threes //Don't blindly multiply a 0
 }
 
 /*
@@ -45,24 +63,25 @@ fn get_permutations(full_list: Vec<i32>) -> i64{
 
    for (e, &x) in workan.iter().enumerate() {
     let searcher: Vec<i32>  = workan.clone();
-     let i_target: usize = e+1;
-     if i_target >= workan.len() {
-       break;
-     }
-     let target: i32 = searcher[i_target];
-     if target - x == 1 {
-       one +=1;
-     } else if target - x == 2 {
-      println!("Sommin");
-     }
-     else if target - x == 3{
-      three +=1;
-     } else {
-       println!("Oh man, not sure how we got here");
-     }
-   }
+    let i_target: usize = e+1;
+    if i_target >= workan.len() {
+      break;
+    }
+     
+    let target: i32 = searcher[i_target];
+    if target - x == 1 {
+      one +=1;
+    } else if target - x == 2 {
+    println!("Sommin");
+    }
+    else if target - x == 3{
+    three +=1;
+    } else {
+      println!("Oh man, not sure how we got here");
+    }
+  }
 
-   (one as i32, three as i32)
+  (one as i32, three as i32)
  }
 
 //Thanks, fasterthanlime!
