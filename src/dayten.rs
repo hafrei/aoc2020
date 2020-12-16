@@ -33,14 +33,13 @@ fn get_permutations(full_list: Vec<i32>) -> i64{
   So, maybe you could do an array of the gaps and get the permutations of all the gaps/potential gaps
   0..x
   Need to know if the neighbors can be removed before considering each number's individual permutation
-  Worst case scenario and every gap is 1, the range needs to be 3 in either direction, if exists
+  Worst case scenario and every gap is 1, the range needs to be 2 in either direction, if exists
   0 and <create last number> cannot be removed
+  So get the total number of all the possible combinations for every individual place and multiply them together
  */
 
  fn gap_count(worklist: Vec<i32>) -> (i32, i32){ //2170 too low 6300 too high
-   let mut workan: Vec<i32> = worklist;
-   workan.sort_unstable();
-   workan.push(workan.last().unwrap()+3); //The laptop
+   let workan: Vec<i32> = worklist;
    let mut one = 0;
    let mut three = 0;
 
@@ -69,11 +68,13 @@ fn get_permutations(full_list: Vec<i32>) -> i64{
 //Thanks, fasterthanlime!
 fn prepare_input (filepath: &str) -> Vec<i32> {
   let list = fs::read_to_string(filepath).expect("Yeah, that's not a file");
-  let ret = list
+  let mut ret: Vec<i32> = list
                       .as_str()
                       .split('\n')
                       .map(str::parse::<i32>)
                       .map(Result::unwrap)
                       .collect();
+  ret.sort_unstable(); //Now the list is in order
+  ret.push(ret.last().unwrap()+3); //adding the laptop to the end
   ret
 }
