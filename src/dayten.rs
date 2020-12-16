@@ -1,9 +1,7 @@
 use std::fs;
-use itertools::Itertools;
-
 
 pub fn execute_dayten() {
-  let path = "./input/day10.txt";
+  let path = "./input/day10test1.txt";
   let working: Vec<i32> = prepare_input(path);
   let (one, three) = gap_count(working.clone());
   println!("Should be {} * {} = {}", one, three, one * three );
@@ -13,30 +11,36 @@ pub fn execute_dayten() {
 }
 
 fn get_permutations(full_list: Vec<i32>) -> i64{
+  let look_ahead = 4;
   let mut ones = 0;
   let mut twos = 0;
   let mut threes = 0;
 
+
   for (e, &x) in full_list.iter().enumerate() {
-    let i_target: usize = e+1;
-    if i_target >= full_list.len() {
-      break;
+
+    for y in 1..look_ahead {
+      let ey = e+y;
+      if ey >= full_list.len() {
+        break;
+      }
+      let cur_tar = full_list[ey];//Looks ahead
+      println!("Comparing to {} with {}.", x, cur_tar);
+      if cur_tar - x == 1 {
+        ones +=1;
+      } 
+      if cur_tar - x == 2 {
+        twos += 1;
+      }
+      if cur_tar - x == 3{
+        threes +=1;
+      }
     }
-    let target: i32 = full_list[i_target];
-    if target - x == 1 {
-      ones +=1;
-    } 
-    if target - x == 2 {
-      twos += 1;
-    }
-    if target - x == 3{
-      threes +=1;
-    } else {
-      println!("Oh man, not sure how we got here");
-    }
+    println!("After {} there are {} ones {} twos and {} threes", x, ones, twos, threes);
   }
 
-  ones * twos * threes //Don't blindly multiply a 0
+
+  ones * twos * threes
 }
 
 /*
