@@ -1,4 +1,5 @@
 use std::fs;
+use std::cmp::Ordering;
 
 #[derive(Clone)]
 struct XmasStream {
@@ -37,31 +38,33 @@ fn exploit_weakness(working: Vec<XmasStream>, preamble: usize, weak_point: i64) 
   while exploit_sum == 0 {
     _p_work = _w_copy[preamble_start..preamble_end].to_vec().clone();
 
-    for i in 0.._p_work.len() {
+    for i in &_p_work {
       let mut weak_combo: Vec<usize> = Vec::new();
-      let mut work_sum = _p_work[i].value;
-      for j in 0.._p_work.len() {
-        if work_sum < weak_point {
-          work_sum += _p_work[j].value;
-          weak_combo.push(_p_work[j].value as usize);
-        } else if work_sum > weak_point {
-          work_sum = 0;
-          break;
-        } else if work_sum == weak_point {
-          weak_combo.sort();
-          exploit_sum = weak_combo[0] as i64 + weak_combo[weak_combo.len()-1] as i64;
-          break;
+      let mut _work_sum = i.value;
+      weak_combo.push(i.value as usize);
+
+      for j in &_p_work {
+        match _work_sum.cmp(&weak_point) {
+          Ordering::Less => {
+            _work_sum += j.value;
+            weak_combo.push(j.value as usize);
+          }
+          Ordering::Equal => {
+            weak_combo.sort_unstable(); // You want 43434797 (lives at 548) and 86009758 (lives at 562)
+            exploit_sum = weak_combo.first().unwrap() + weak_combo.last().unwrap();
+            break;
+          }
+          Ordering::Greater => {
+            _work_sum = 0;
+            break;
+          }
         }
-      }
-      if exploit_sum > 0 || work_sum > weak_point {
-        break;
       }
     }
     preamble_start += 1;
     preamble_end += 1;
   }
-
-  return exploit_sum;
+  exploit_sum as i64
 }
 
 fn find_weakness(working: Vec<XmasStream>, preamble: usize) -> i64{
@@ -99,7 +102,7 @@ fn find_weakness(working: Vec<XmasStream>, preamble: usize) -> i64{
     preamble_end += 1;
   }
 
-  return weak_point;
+  weak_point
 }
 
 fn prepare_input (filepath: &str) -> Vec<XmasStream> {
@@ -109,5 +112,5 @@ fn prepare_input (filepath: &str) -> Vec<XmasStream> {
   for lin in list.lines() {
     ret.push(XmasStream::new(lin.parse::<i64>().unwrap(), ret.len()));
   }
-  return ret;
+  ret
 }

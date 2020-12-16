@@ -17,7 +17,7 @@ pub fn execute_daythree() {
   println!("That's {}! That's a lot", all_of_them);
 }
 
-fn get_treecount(tree_plane: &Vec<String>, trajectory: u16, skip: i32) -> u16 {
+fn get_treecount(tree_plane: &[String], trajectory: u16, skip: i32) -> u16 {
   let mut scanner: u16 = 0;
   let mut counter: u16 = 0;
   let template: char = '#';
@@ -39,15 +39,16 @@ fn get_treecount(tree_plane: &Vec<String>, trajectory: u16, skip: i32) -> u16 {
         jump -= 1;
       }
     }
-    return counter; //I don't know why but this is producing an off by one error on jump<> 0
+    counter //I don't know why but this is producing an off by one error on jump<> 0
 }
 
 fn prepare_input (filepath: &str) -> Vec<String> {
-  let mut ret: Vec<String> = Vec::new();
   let list = fs::read_to_string(filepath).expect("Yeah, that's not a file");
-
-  for lin in list.lines() {
-    ret.push(lin.to_string().clone());
-  }
-  return ret;
+  let ret = list
+                      .as_str()
+                      .split('\n')
+                      .map(str::parse::<String>)
+                      .map(Result::unwrap)
+                      .collect();
+  ret
 }
