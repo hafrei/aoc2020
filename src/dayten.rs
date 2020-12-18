@@ -1,7 +1,7 @@
 use std::fs;
 
 pub fn execute_dayten() {
-  let path = "./input/day10test1.txt";
+  let path = "./input/day10.txt";
   let working: Vec<i32> = prepare_input(path);
   let (one, three) = gap_count(working.clone());
   println!("Should be {} * {} = {}", one, three, one * three );
@@ -10,37 +10,38 @@ pub fn execute_dayten() {
   println!("There's {} permutations", perms);
 }
 
-fn get_permutations(full_list: Vec<i32>) -> i64{
-  let look_ahead = 4;
-  let mut ones = 0;
-  let mut twos = 0;
-  let mut threes = 0;
+// This is from https://github.com/tudorpavel/advent-of-code-2020/blob/master/day10/src/main.rs
+// I didn't come up with this solution, I couldn't get mine to work.
+fn get_permutations(full_list: Vec<i32>) -> i64 {
+  let mut slices = vec![];
+  let mut current_slice = vec![];
 
-
-  for (e, &x) in full_list.iter().enumerate() {
-
-    for y in 1..look_ahead {
-      let ey = e+y;
-      if ey >= full_list.len() {
-        break;
+  // generate slices of consecutive 1-diff elements, for example:
+  // input:  [0, 1, 4, 5, 6, 9]
+  // result: [[0, 1], [4, 5, 6], [9]]
+  for window in full_list.windows(2) {
+      match window[1] - window[0] {
+          1 => current_slice.push(window[0]),
+          3 => {
+              current_slice.push(window[0]);
+              slices.push(current_slice);
+              current_slice = vec![];
+          }
+          _ => (),
       }
-      let cur_tar = full_list[ey];//Looks ahead
-      println!("Comparing to {} with {}.", x, cur_tar);
-      if cur_tar - x == 1 {
-        ones +=1;
-      } 
-      if cur_tar - x == 2 {
-        twos += 1;
-      }
-      if cur_tar - x == 3{
-        threes +=1;
-      }
-    }
-    println!("After {} there are {} ones {} twos and {} threes", x, ones, twos, threes);
   }
 
-
-  ones * twos * threes
+  slices
+      .iter()
+      .map(|slice| match slice.len() {
+          1 => 1,
+          2 => 1,
+          3 => 2,
+          4 => 4,
+          5 => 7,
+          _ => panic!("unexpected slice of size N > 5 consecutive 1-diff elements"),
+      })
+      .product()
 }
 
 /*
