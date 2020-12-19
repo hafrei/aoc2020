@@ -5,6 +5,16 @@ pub fn execute_dayeleven(){
   let working= prepare_input(path);
 }
 
+/* Look into traits? 
+  . Unoccupied; never changes
+   L if not occupied and no adjacent occupied seats
+   # occupied. If 4 adjacent seats are occupied, it becomes unoccupied
+
+   Apply these rules until no more changes
+   Count the number of occupied seats
+*/
+
+
 fn prepare_input (filepath: &str) -> Vec<String> {
   let list = fs::read_to_string(filepath).expect("Yeah, that's not a file");
   let ret: Vec<String> = list
