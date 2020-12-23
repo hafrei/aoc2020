@@ -4,7 +4,7 @@ pub fn execute_dayeleven(){
   let path = "./input/day11test.txt";
   let working= prepare_input(path);
   let occupied_seats = find_stable_occupied(working);
-  println!("Waiting");
+  println!("There are {} occupied seats at stability", occupied_seats);
 }
 
 /* 
@@ -18,14 +18,16 @@ pub fn execute_dayeleven(){
 
 fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
   let mut active_layout = layout.clone();
+  let threshold = 4;
   let mut occupied = 0;
-  let mut iterated = 0;
+  let mut total_occupied: i32 = 0;
+  let mut prev_occ = 0;
 
   loop {
-    let new_layout = active_layout.clone();
-    let prev_occ = 0;
+    let mut new_layout = active_layout.clone();
 
     for (ena, r) in active_layout.clone().iter().enumerate() {
+      let mut total_available = 0;
       let row_length = r.len() -1;
       let olr = match ena { //inner lower range
         0 => 0,
@@ -38,6 +40,7 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
       };
 
       for (enb, c) in r.iter().enumerate() {
+        let ta_reset = total_available;
         let mut counted = 0;
         let mut looking_for = 0; //0 is value idk, 1 is value of open, 2 is the value of occupied
         // what is current seat?
@@ -57,38 +60,55 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
           false => enb + 1
         };
 
-        // Check the current row for occupied seats
+        //Check the current row for occupied seats to the right
         if !enb.eq(&0) {
           counted += check_seat(r[ilr], looking_for);
+          total_available += 1;
         }
-
+        // and then to the left
         if !enb.eq(&row_length) {
           counted += check_seat(r[iur], looking_for);
+          total_available += 1;
         }
 
         // Check the row above for occupied seats
         if !ena.eq(&0) {
           let upper_row = &active_layout[olr][ilr..=iur];
+          total_available += upper_row.len();
           counted += &upper_row.iter()
                         .map(|x| check_seat(*x, looking_for))
                         .sum();
         }
         // Check the row below for occupied seats
         if !ena.eq(&row_length) {
-          let upper_row = &active_layout[our][ilr..=iur];
-          counted += &upper_row.iter()
+          let lower_row = &active_layout[our][ilr..=iur];
+          total_available += lower_row.len();
+          counted += &lower_row.iter()
                         .map(|x| check_seat(*x, looking_for))
                         .sum();
         }
-        println!("{}", counted);
+        if counted.eq(&(total_available as i32)) {
+          new_layout[ena][enb] = b'#';
+          occupied +=1;
+        }
+        total_available = ta_reset;
       }
     }
-
-    if prev_occ.eq(&occupied) {
+    active_layout = new_layout;
+    //Finally, if there have been no changes from this round and last round
+    // then count the number of occupied seats and break out of the loop
+    if prev_occ.eq(&occupied) { //This no longer works properly
+      total_occupied += active_layout.iter()
+                              .flatten()
+                              .map(|x| if x.eq(&b'#') {1} else {0})
+                              .sum::<i32>();
       break;
+    } else {
+      prev_occ = occupied;
+      occupied = 0;
     }
   }
-  occupied
+  total_occupied
 }
 /**
  * Returns 1 if seat matches L, #, or other
