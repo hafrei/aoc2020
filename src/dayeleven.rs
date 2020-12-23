@@ -1,9 +1,9 @@
 use std::fs;
 
 pub fn execute_dayeleven(){
-  let path = "./input/day11test.txt";
+  let path = "./input/day11.txt";
   let working= prepare_input(path);
-  let occupied_seats = find_stable_occupied(working);
+  let occupied_seats = find_stable_occupied(working); // 2164 is too low
   println!("There are {} occupied seats at stability", occupied_seats);
 }
 
@@ -17,7 +17,7 @@ pub fn execute_dayeleven(){
 */
 
 fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
-  let mut active_layout = layout.clone();
+  let mut active_layout = layout;
   let threshold = 4;
   let mut occupied = 0;
   let mut total_occupied: i32 = 0;
@@ -26,15 +26,17 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
   loop {
     let mut new_layout = active_layout.clone();
 
-    for (ena, r) in active_layout.clone().iter().enumerate() {
+    for (ena, r) in active_layout.iter().enumerate() {
       let mut total_available = 0;
+      let area_length = active_layout.len() -1;
       let row_length = r.len() -1;
-      let olr = match ena { //inner lower range
+
+      let olr = match ena { //outer lower range
         0 => 0,
         _ => ena - 1
       };
 
-      let our = match row_length.eq(&ena) { //inner upper range
+      let our = match area_length.eq(&ena) { //outer upper range
         true => ena,
         false => ena + 1
       };
@@ -87,17 +89,25 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
                         .map(|x| check_seat(*x, looking_for))
                         .sum();
         }
-        if counted.eq(&(total_available as i32)) {
+        // If we are currently counting up open seats and enough are vacant, sit down
+        //If we are currently counting up occupied seats and enough are full
+        if looking_for.eq(&1) && counted.eq(&(total_available as i32)) {
           new_layout[ena][enb] = b'#';
           occupied +=1;
+        } else if looking_for.eq(&2) && counted.ge(&threshold) {
+          new_layout[ena][enb] = b'L';
+          occupied -=1;
         }
+
         total_available = ta_reset;
       }
     }
+    // Since we are no longer iterating over active layout we can update it with the changes
     active_layout = new_layout;
     //Finally, if there have been no changes from this round and last round
     // then count the number of occupied seats and break out of the loop
     if prev_occ.eq(&occupied) { //This no longer works properly
+      //println!("{:?}", active_layout);
       total_occupied += active_layout.iter()
                               .flatten()
                               .map(|x| if x.eq(&b'#') {1} else {0})
@@ -105,7 +115,7 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
       break;
     } else {
       prev_occ = occupied;
-      occupied = 0;
+      //occupied = 0; Occupied now decrements so I shouldn't need this anymore
     }
   }
   total_occupied
