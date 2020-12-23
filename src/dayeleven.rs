@@ -1,4 +1,9 @@
 use std::fs;
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::Error;
+use std::io::LineWriter;
+
 
 pub fn execute_dayeleven(){
   let path = "./input/day11.txt";
@@ -17,14 +22,15 @@ pub fn execute_dayeleven(){
 */
 
 fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
-  let mut active_layout = layout;
-  let threshold = 4;
-  let mut occupied = 0;
-  let mut total_occupied: i32 = 0;
-  let mut prev_occ = 0;
+  let mut active_layout = layout; // Used as iterator 2D Vector for each round
+  let threshold = 4; // A seat becomes available if 4 or more adjacent seats are occupied
+  let mut occupied = 0; // Counts number of occupied seats for this round
+  let mut prev_occ = 0; // Holds the number of occupied seats from last round
+  let mut total_occupied: i32 = 0; // Return value, recieves sum from active_layout's occupied seat count
+  let mut counter = 0; // Used for creating the output file
 
   loop {
-    let mut new_layout = active_layout.clone();
+    let mut new_layout = active_layout.clone(); 
 
     for (ena, r) in active_layout.iter().enumerate() {
       let mut total_available = 0;
@@ -103,6 +109,8 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
       }
     }
     // Since we are no longer iterating over active layout we can update it with the changes
+    write_iter(new_layout.clone(), counter);
+    counter += 1; // Since we'll be writing every iteration
     active_layout = new_layout;
     //Finally, if there have been no changes from this round and last round
     // then count the number of occupied seats and break out of the loop
@@ -149,6 +157,22 @@ fn check_seat(seat: u8, l_f: u8) -> i32 {
     }
   } 
   ret
+}
+
+fn write_iter(cm: Vec<Vec<u8>>, iter: usize) -> Result<(), Error> {
+  let mut iterwrite = "./output/day11_".to_string();
+  iterwrite.push_str(iter.to_string().as_str());
+  iterwrite.push_str(".txt");
+
+  let file = File::create(iterwrite)?;
+  let mut buffer = LineWriter::new(file);
+
+  for c in cm {
+    buffer.write_all(&c);
+    buffer.write_all(b"\n");
+  }
+  buffer.flush();
+  Ok(())
 }
 
 /**
