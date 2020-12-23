@@ -32,10 +32,11 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
   loop {
     let mut new_layout = active_layout.clone(); 
 
+    //ena = Enumerator A, counter of the whole grid
+    // r = row of grid
     for (ena, r) in active_layout.iter().enumerate() {
       let mut total_available = 0;
       let area_length = active_layout.len() -1;
-      let row_length = r.len() -1;
 
       let olr = match ena { //outer lower range
         0 => 0,
@@ -47,39 +48,45 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
         false => ena + 1
       };
 
+      //enb = enumerator b, Index of current row
       for (enb, c) in r.iter().enumerate() {
+        let row_length = r.len() -1;
         let ta_reset = total_available;
         let mut counted = 0;
         let mut looking_for = 0; //0 is value idk, 1 is value of open, 2 is the value of occupied
-        // what is current seat?
+
+        //What is current seat?
         looking_for = check_seat(*c, looking_for) as u8;
 
+        // Don't bother running everything for hallway space
         if looking_for.eq(&3) {
           continue;
         }
 
-        let ilr = match enb { //inner lower range
+        //inner lower range
+        let ilr = match enb { 
           0 => 0,
           _ => enb - 1
         };
 
-        let iur = match row_length.eq(&enb) { //inner upper range
+        //inner upper range
+        let iur = match row_length.eq(&enb) { 
           true => enb,
           false => enb + 1
         };
 
-        //Check the current row for occupied seats to the right
+        //Check the current row for occupied seats to the left
         if !enb.eq(&0) {
           counted += check_seat(r[ilr], looking_for);
           total_available += 1;
         }
-        // and then to the left
+        // and then to the right
         if !enb.eq(&row_length) {
           counted += check_seat(r[iur], looking_for);
           total_available += 1;
         }
 
-        // Check the row above for occupied seats
+        // Check the row above (lower number) for occupied seats
         if !ena.eq(&0) {
           let upper_row = &active_layout[olr][ilr..=iur];
           total_available += upper_row.len();
@@ -87,15 +94,16 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
                         .map(|x| check_seat(*x, looking_for))
                         .sum();
         }
-        // Check the row below for occupied seats
-        if !ena.eq(&row_length) {
+        // Check the row below (higher number) for occupied seats
+        if !ena.eq(&area_length) {
           let lower_row = &active_layout[our][ilr..=iur];
           total_available += lower_row.len();
           counted += &lower_row.iter()
                         .map(|x| check_seat(*x, looking_for))
                         .sum();
         }
-        // If we are currently counting up open seats and enough are vacant, sit down
+
+        //If we are currently counting up open seats and enough are vacant, sit down
         //If we are currently counting up occupied seats and enough are full
         if looking_for.eq(&1) && counted.eq(&(total_available as i32)) {
           new_layout[ena][enb] = b'#';
@@ -108,9 +116,12 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
         total_available = ta_reset;
       }
     }
-    // Since we are no longer iterating over active layout we can update it with the changes
+    
+    //Write current grid to file
     write_iter(new_layout.clone(), counter);
     counter += 1; // Since we'll be writing every iteration
+
+        // Since we are no longer iterating over active layout we can update it with the changes
     active_layout = new_layout;
     //Finally, if there have been no changes from this round and last round
     // then count the number of occupied seats and break out of the loop
@@ -159,6 +170,11 @@ fn check_seat(seat: u8, l_f: u8) -> i32 {
   ret
 }
 
+/**
+ * Write the grid to file. Is formatted into expected characters for free!
+ * Files are written into ./output as day11_<iter>.txt
+ * Currently loaded with warnings because I'm not checking for Errors
+ */
 fn write_iter(cm: Vec<Vec<u8>>, iter: usize) -> Result<(), Error> {
   let mut iterwrite = "./output/day11_".to_string();
   iterwrite.push_str(iter.to_string().as_str());
