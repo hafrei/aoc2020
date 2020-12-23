@@ -16,7 +16,7 @@ pub fn execute_dayeleven(){
    Count the number of occupied seats
 */
 
-fn find_stable_occupied(layout: Vec<String>) -> i32 {
+fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
   let mut active_layout = layout.clone();
   let mut occupied = 0;
   let mut iterated = 0;
@@ -25,12 +25,12 @@ fn find_stable_occupied(layout: Vec<String>) -> i32 {
     let new_layout = active_layout.clone();
     let prev_occ = 0;
 
-    for (ina, r) in active_layout.clone().iter().enumerate() {
-      for (inb, c) in r.char_indices() {
+    for (ena, r) in active_layout.clone().iter().enumerate() {
+      for (enb, c) in r.iter().enumerate() {
         match c {
-          '.' => println!("Floor"),
-          'L' => println!("Open"),
-          '#' => println!("Occupied"),
+          b'.' => println!("Floor"),
+          b'L' => println!("Open"),
+          b'#' => println!("Occupied"),
           _ => println!("Not sure what happened here")
         }
       }
@@ -44,15 +44,12 @@ fn find_stable_occupied(layout: Vec<String>) -> i32 {
 }
 
 
-fn prepare_input (filepath: &str) -> Vec<String> {
+fn prepare_input (filepath: &str) -> Vec<Vec<u8>> {
   let list = fs::read_to_string(filepath).expect("Yeah, that's not a file");
-  let ret= list
+  let ret: Vec<Vec<u8>>= list
                       .as_str()
                       .split('\n')
-                      .map(str::parse::<String>)
-                      .map(Result::unwrap)
+                      .map(|x| x.as_bytes().to_vec()) //OH MY GOD IT WORKED
                       .collect();
-
-    
   ret
 }
