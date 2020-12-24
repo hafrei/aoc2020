@@ -11,11 +11,10 @@ pub fn execute_dayone() { //344ms
 }
 
 fn get_triple(worklist: Vec<i32>) -> Vec<i32> {
-  let mut breaker = false;
   let working: Vec<i32> = worklist.clone();
   let mut the_triple: Vec<i32> = Vec::new();
 
-  for x in worklist {
+  'test: for x in worklist {
       for y in &working {
         let target:i32 = 2020 - x - y;
 
@@ -23,13 +22,9 @@ fn get_triple(worklist: Vec<i32>) -> Vec<i32> {
           the_triple.push(x);
           the_triple.push(*y);
           the_triple.push(target);
-          breaker = true;
-          break;
+          break 'test;
         }
       }
-    if breaker {
-      break;
-    }
   }
 
   the_triple
