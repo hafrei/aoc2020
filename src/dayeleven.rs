@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::Error;
 use std::io::LineWriter;
+use std::cmp::Ordering;
 
 pub fn execute_dayeleven(){
   let path = "./input/day11test.txt";
@@ -15,7 +16,7 @@ pub fn execute_dayeleven(){
 
 /* 
   . Unoccupied; never changes
-   L if not occupied and no adjacent occupied seats
+   L if not occupied and no visible occupied seats
    # occupied. If 5 seats are occupied in any of the 8 directions, it becomes unoccupied
 
    Apply these rules until no more changes
@@ -23,11 +24,11 @@ pub fn execute_dayeleven(){
 */
 fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
   let mut active_layout = layout; // Used as iterator 2D Vector for each round
-  let threshold = 4; // A seat becomes available if 4 or more adjacent seats are occupied
+  let threshold = 5; // A seat becomes available if 5 or more visible seats are occupied
   let mut occupied = 0; // Counts number of occupied seats for this round
   let mut prev_occ = 0; // Holds the number of occupied seats from last round
   let mut total_occupied: i32 = 0; // Return value, recieves sum from active_layout's occupied seat count
-  //let mut counter = 0; // Used for creating the output file
+  let mut counter = 0; // Used for creating the output file
 
   loop {
     let mut new_layout = active_layout.clone(); 
@@ -66,39 +67,41 @@ fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
           total_available += found_maybe;
         }
 
-        // Check the row above (lower number) for occupied seats
-        //TODO: How about, instead, you find which is bigger: 
-        // ena/enb, 0 or area_length or row_length
-        // And then on each loop, subtract an interator with that number from the direction
         if !ena.eq(&0) {
+          total_available += 1;
           //Look directly above current seat
-          for lu in ena..=0 {
+          for lu in (0..ena).rev() {
             if check_seat(active_layout[lu][enb], looking_for) == 1 {
               counted += 1;
-              total_available += 1;
               break;
             }
           }
 
-          // then above left
+          // then above left. 
           if !enb.eq(&0) {
-            for ll in enb..=0 {
-              if check_seat(active_layout[ll][enb], looking_for) == 1 {
+            total_available += 1;
+            let mut angle=  enb - 1;
+            for ll in (0..ena).rev() {
+              if check_seat(active_layout[ll][angle], looking_for) == 1 {
                 counted += 1;
-                total_available += 1;
                 break;
               }
+              if !angle.eq(&0) && !angle.eq(&0) {
+                angle -= 1;
+              }
             }
-            
           }
           // then above right
           if !enb.eq(&row_length) {
-            let look_up_right: Vec<usize> = (enb+1..=row_length).collect();
-            for lr in look_up_right {
-              if check_seat(active_layout[lr][enb], looking_for) == 1 {
+            total_available += 1;
+            let mut angle=  enb +1;
+            for lr in (enb+1..=row_length).rev() {
+              if check_seat(active_layout[lr][angle], looking_for) == 1 {
                 counted += 1;
-                total_available += 1;
                 break;
+              }
+              if !angle.eq(&row_length) && !angle.eq(&area_length) {
+                angle += 1;
               }
             }
           }
@@ -106,18 +109,46 @@ fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
         }
         // Check the row below (higher number) for occupied seats
         if !ena.eq(&area_length) {
-          let look_down: Vec<usize> = (ena..=area_length).collect();
-          for ld in look_down {
+          total_available += 1;
+          for ld in ena +1..=area_length {
             if check_seat(active_layout[ld][enb], looking_for) == 1 {
               counted += 1;
-              total_available += 1;
               break;
+            }
+          }
+
+          // then below left - This doesn't work at higher numbers
+          if !enb.eq(&0) {
+            total_available += 1;
+            let mut angle=  enb - 1;
+            for ll in ena + 1..area_length {
+              if check_seat(active_layout[ll][angle], looking_for) == 1 {
+                counted += 1;
+                break;
+              }
+              if !angle.eq(&0) && !angle.eq(&0) {
+                angle -= 1;
+              }
+            }
+          }
+          // then below right
+          if !enb.eq(&row_length) {
+            total_available += 1;
+            let mut angle=  enb +1;
+            for lr in ena + 1..row_length{
+              if check_seat(active_layout[lr][angle], looking_for) == 1 {
+                counted += 1;
+                break;
+              }
+              if !angle.eq(&row_length) && !angle.eq(&area_length) {
+                angle += 1;
+              }
             }
           }
         }
 
         //If we are currently counting up open seats and enough are vacant, sit down
-        //If we are currently counting up occupied seats and enough are full
+        //If we are currently counting up occupied seats and enough are full, get up
         if looking_for.eq(&1) && counted.eq(&(total_available as i32)) {
           new_layout[ena][enb] = b'#';
           occupied +=1;
@@ -131,8 +162,8 @@ fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
     }
 
     //Write current grid to file
-    //write_iter(new_layout.clone(), counter);
-    //counter += 1; // Since we'll be writing every iteration
+    write_iter(new_layout.clone(), counter);
+    counter += 1; // Since we'll be writing every iteration
 
     // Since we are no longer iterating over active layout we can update it with the changes
     active_layout = new_layout;
