@@ -1,27 +1,20 @@
-mod dayone;
-mod daytwo;
-mod daythree;
-mod dayfour;
-mod dayfive;
-mod daysix;
-mod dayseven;
 mod dayeight;
-mod daynine;
-mod dayten;
 mod dayeleven;
+mod dayfive;
+mod dayfour;
+mod daynine;
+mod dayone;
+mod dayseven;
+mod daysix;
+mod dayten;
+mod daythree;
+mod daytwo;
 use {
-    dayone::execute_dayone,
-    daytwo::execute_daytwo,
-    daythree::execute_daythree,
-    dayfour::execute_dayfour,
-    dayfive::execute_dayfive,
-    daysix::execute_daysix,
-    dayseven::execute_dayseven,
-    dayeight::execute_dayeight,
-    daynine::execute_daynine,
-    dayten::execute_dayten,
-    dayeleven::execute_dayeleven
-    };
+    dayone::execute_dayone, daytwo::execute_daytwo, daythree::execute_daythree,
+    dayfour::execute_dayfour, dayfive::execute_dayfive, daysix::execute_daysix,
+    dayseven::execute_dayseven, dayeight::execute_dayeight, daynine::execute_daynine,
+    dayten::execute_dayten, dayeleven::execute_dayeleven,
+};
 use std::time::SystemTime;
 
 fn main() {
@@ -62,7 +55,8 @@ fn main() {
 
 fn runtime(start: SystemTime) {
     let new_sys_time = SystemTime::now();
-    let difference = new_sys_time.duration_since(start)
-    .expect("Clock may have gone backwards");
+    let difference = new_sys_time
+        .duration_since(start)
+        .expect("Clock may have gone backwards");
     println!("Runtime was {:?}; resetting timer.\n", difference);
 }
