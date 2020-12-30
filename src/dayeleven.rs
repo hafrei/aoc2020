@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::Error;
 use std::io::LineWriter;
-use std::cmp::Ordering;
+use std::ops::RangeInclusive;
 
 pub fn execute_dayeleven() {
     let path = "./input/day11test.txt";
@@ -30,7 +30,7 @@ pub fn execute_dayeleven() {
 */
 fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
     let mut active_layout = layout; // Used as iterator 2D Vector for each round
-    let threshold = 5; // A seat becomes available if 5 or more visible seats are occupied
+    let threshold: i32 = 5; // A seat becomes available if 5 or more visible seats are occupied
     let mut occupied = 0; // Counts number of occupied seats for this round
     let mut prev_occ = 0; // Holds the number of occupied seats from last round
     let mut total_occupied: i32 = 0; // Return value, recieves sum from active_layout's occupied seat count
@@ -52,12 +52,14 @@ fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
                 let mut counted = 0;
                 let mut looking_for = 0; //0 is value idk, 1 is value of open, 2 is the value of occupied
 
-                //What is current seat?
+                //What is current seat? let's find out what mode we're in
                 looking_for = check_seat(*c, looking_for) as u8;
 
                 // Don't bother running everything for hallway space
                 if looking_for.eq(&3) {
                     continue;
+                } else if looking_for.eq(&1) {
+                    looking_for = 4; //change modes to explicitly empty only
                 }
 
                 //Look down the current row for occupied seats to the left
@@ -74,87 +76,85 @@ fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
                 }
 
                 if ena.ne(&0) {
-                    total_available += 1;
                     //Look directly above current seat
-                    for lu in (0..ena).rev() {
-                        if check_seat(active_layout[lu][enb], looking_for) == 1 {
-                            counted += 1;
-                            break;
-                        }
-                    }
+                    let found_maybe =
+                        look_diag(enb, &active_layout, looking_for, 0, ena, threshold as u8, 0);
+                    counted += found_maybe;
+                    total_available += 1;
 
                     // then above left.
                     if enb.ne(&0) {
+                        counted += look_diag(
+                            enb - 1,
+                            &active_layout,
+                            looking_for,
+                            0,
+                            ena,
+                            threshold as u8,
+                            2,
+                        );
                         total_available += 1;
-                        let mut angle = enb - 1;
-                        for ll in (0..ena).rev() {
-                            if check_seat(active_layout[ll][angle], looking_for) == 1 {
-                                counted += 1;
-                                break;
-                            }
-                            if !angle.eq(&0) && !angle.eq(&0) {
-                                angle -= 1;
-                            }
-                        }
                     }
                     // then above right
                     if enb.ne(&row_length) {
+                        counted += look_diag(
+                            enb + 1,
+                            &active_layout,
+                            looking_for,
+                            0,
+                            ena,
+                            threshold as u8,
+                            1,
+                        );
                         total_available += 1;
-                        let mut angle = enb + 1;
-                        for lr in (enb + 1..=row_length).rev() {
-                            if check_seat(active_layout[lr][angle], looking_for) == 1 {
-                                counted += 1;
-                                break;
-                            }
-                            if !angle.eq(&row_length) && !angle.eq(&area_length) {
-                                angle += 1;
-                            }
-                        }
                     }
                 }
                 // Check the row below (higher number) for occupied seats
                 if ena.ne(&area_length) {
+                    counted += look_diag(
+                        enb,
+                        &active_layout,
+                        looking_for,
+                        ena + 1,
+                        area_length,
+                        threshold as u8,
+                        0,
+                    );
                     total_available += 1;
-                    for ld in ena + 1..=area_length {
-                        if check_seat(active_layout[ld][enb], looking_for) == 1 {
-                            counted += 1;
-                            break;
-                        }
-                    }
 
-                    // then below left - This doesn't work at higher numbers
+                    // then below left
                     if enb.ne(&0) {
+                        counted += look_diag(
+                            enb - 1,
+                            &active_layout,
+                            looking_for,
+                            ena + 1,
+                            area_length,
+                            threshold as u8,
+                            2,
+                        );
                         total_available += 1;
-                        let mut angle = enb - 1;
-                        for ll in ena + 1..area_length {
-                            if check_seat(active_layout[ll][angle], looking_for) == 1 {
-                                counted += 1;
-                                break;
-                            }
-                            if !angle.eq(&0) && !angle.eq(&0) {
-                                angle -= 1;
-                            }
-                        }
                     }
                     // then below right
                     if enb.ne(&row_length) {
+                        counted += look_diag(
+                            enb + 1,
+                            &active_layout,
+                            looking_for,
+                            ena + 1,
+                            row_length,
+                            threshold as u8,
+                            1,
+                        );
                         total_available += 1;
-                        let mut angle = enb + 1;
-                        for lr in ena + 1..row_length {
-                            if check_seat(active_layout[lr][angle], looking_for) == 1 {
-                                counted += 1;
-                                break;
-                            }
-                            if !angle.eq(&row_length) && !angle.eq(&area_length) {
-                                angle += 1;
-                            }
-                        }
                     }
                 }
 
                 //If we are currently counting up open seats and enough are vacant, sit down
                 //If we are currently counting up occupied seats and enough are full, get up
-                if looking_for.eq(&1) && counted.eq(&(total_available as i32)) {
+                //Currently, if we get all the way through checks for empty seats and finding no occupied seats
+                // Then we don't count that seat
+                if looking_for.eq(&4) && counted.eq(&(total_available as i32)) {
                     new_layout[ena][enb] = b'#';
                     occupied += 1;
                 } else if looking_for.eq(&2) && counted.ge(&threshold) {
@@ -253,24 +253,24 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
                 };
 
                 //Check the current row for occupied seats to the left
-                if !enb.eq(&0) {
+                if enb.ne(&0) {
                     counted += check_seat(r[ilr], looking_for);
                     total_available += 1;
                 }
                 // and then to the right
-                if !enb.eq(&row_length) {
+                if enb.ne(&row_length) {
                     counted += check_seat(r[iur], looking_for);
                     total_available += 1;
                 }
 
                 // Check the row above (lower number) for occupied seats
-                if !ena.eq(&0) {
+                if ena.ne(&0) {
                     let upper_row = &active_layout[olr][ilr..=iur];
                     total_available += upper_row.len();
                     counted += &upper_row.iter().map(|x| check_seat(*x, looking_for)).sum();
                 }
                 // Check the row below (higher number) for occupied seats
-                if !ena.eq(&area_length) {
+                if ena.ne(&area_length) {
                     let lower_row = &active_layout[our][ilr..=iur];
                     total_available += lower_row.len();
                     counted += &lower_row.iter().map(|x| check_seat(*x, looking_for)).sum();
@@ -312,12 +312,15 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
 // Find the first occurance of the seat you're looking for on the right
 fn look_right(enb: usize, r: &[u8], looking_for: u8, row_length: usize) -> i32 {
     let look_right = &r[enb + 1..=row_length];
+    let look_len = look_right.len();
     let mut ret = 0;
 
-    for lr in look_right {
+    for (e, lr) in look_right.into_iter().enumerate() {
         if check_seat(*lr, looking_for) == 1 {
             ret = 1;
             break;
+        } else if e.eq(&look_len) && looking_for.eq(&4) {
+            ret = 1; // we have gone all the way through and found nothing
         }
     }
 
@@ -327,6 +330,7 @@ fn look_right(enb: usize, r: &[u8], looking_for: u8, row_length: usize) -> i32 {
 // Find the first occurance of the seat you're looking for on the left
 fn look_left(enb: usize, r: &[u8], looking_for: u8) -> i32 {
     let mut look_left: Vec<usize> = (0..enb).collect();
+    let look_len = look_left.len();
     let mut ret = 0;
 
     look_left.reverse();
@@ -334,17 +338,65 @@ fn look_left(enb: usize, r: &[u8], looking_for: u8) -> i32 {
         if check_seat(r[ll], looking_for) == 1 {
             ret = 1;
             break;
+        } else if ll.eq(&look_len) && looking_for.eq(&4) {
+            ret = 1; // we have gone all the way through and found nothing
         }
     }
 
     ret
 }
 
+/* ii = inner index, the starting point for the enb adjusting value
+   lf = looking_for, used in check_seat
+   lb = left bound, the beggining (or end) bound for the for loop
+   lb = left bound, the end (or beginning) bound for the for loop
+   al = active_layout
+   thresh = threshold value, it's used in check_seat so pass it as a u8
+*/
+fn look_diag(
+    ii: usize,
+    al: &Vec<Vec<u8>>,
+    lf: u8,
+    lb: usize,
+    rb: usize,
+    thresh: u8,
+    inc: i32,
+) -> i32 {
+    let mut ret = 0;
+    let rng = if lb.gt(&rb) {
+        RangeInclusive::new(rb, lb)
+    } else {
+        RangeInclusive::new(lb, rb)
+    };
+    let mut angle = ii;
+    for i in rng { 
+        if check_seat(al[i][angle], lf) == 1 {
+            ret += 1;
+            break;
+        } else if i.eq(&rb) && lf.eq(&4) {
+            ret += 1;
+        }
+        // using threshold here (which is 5) 
+        // because check_seat with an LF of 5 looks for L and #
+        if check_seat(al[i][angle], thresh) == 1 {
+            break;
+        }
+        if inc.eq(&1) && angle.ne(&lb) && angle.ne(&rb) {
+            angle += 1;
+        } else if inc.eq(&2) && angle.ne(&0) && angle.ne(&0) {
+            angle -= 1;
+        }
+    }
+    ret
+}
+
 /**
  * Returns 1 if seat matches L, #, or other
  * l_f = 0 will return 1 for L, 2 for #, and 3 for other
- * l_f = 1 means L will return 1
+ * l_f = 1 means L and _ will return 1
  * l_f = 2 means # will return 1
+ * l_f = 4 is L only
+ * l_f = 5 is L or #
  * All other char will return 0
 */
 fn check_seat(seat: u8, l_f: u8) -> i32 {
@@ -366,6 +418,20 @@ fn check_seat(seat: u8, l_f: u8) -> i32 {
             b'L' => 0,
             b'#' => 1,
             _ => 0, //Hallways are never occupied
+        }
+    } else if l_f.eq(&4) {
+        //I need an explicit open only
+        ret = match seat {
+            b'L' => 1,
+            b'#' => 0,
+            _ => 0,
+        }
+    } else if l_f.eq(&5) {
+        //I need only seats
+        ret = match seat {
+            b'L' => 1,
+            b'#' => 1,
+            _ => 0,
         }
     }
     ret
