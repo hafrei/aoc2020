@@ -1,12 +1,11 @@
 use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::Error;
-use std::io::LineWriter;
+use std::io::{Error, LineWriter};
 use std::ops::RangeInclusive;
 
-pub fn execute_dayeleven() {
-    let path = "./input/day11test.txt";
+pub fn execute_dayeleven() { //180 is too low
+    let path = "./input/day11.txt";
     let working = prepare_input(path);
     let expected_occupied_seats = find_stable_occupied(working.clone());
     println!(
@@ -34,26 +33,24 @@ fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
     let mut occupied = 0; // Counts number of occupied seats for this round
     let mut prev_occ = 0; // Holds the number of occupied seats from last round
     let mut total_occupied: i32 = 0; // Return value, recieves sum from active_layout's occupied seat count
-    let mut counter = 0; // Used for creating the output file
+    let mut counter = 1; // Used for creating the output file
 
     loop {
         let mut new_layout = active_layout.clone();
-
         //ena = Enumerator A, counter of the whole grid
-        // r = row of grid
-        for (ena, r) in active_layout.iter().enumerate() {
+        for ena in 0..active_layout.len() {
             let mut total_available = 0;
             let area_length = active_layout.len() - 1;
 
             //enb = enumerator b, Index of current row
-            for (enb, c) in r.iter().enumerate() {
-                let row_length = r.len() - 1;
-                let ta_reset = total_available;
+            for enb in 0..active_layout[ena].len() {
+                let row_length = active_layout[ena].len() - 1;
+                let ta_reset = total_available; //Why not make total_available 0 here?
                 let mut counted = 0;
                 let mut looking_for = 0; //0 is value idk, 1 is value of open, 2 is the value of occupied
 
                 //What is current seat? let's find out what mode we're in
-                looking_for = check_seat(*c, looking_for) as u8;
+                looking_for = check_seat(active_layout[ena][enb], looking_for) as u8;
 
                 // Don't bother running everything for hallway space
                 if looking_for.eq(&3) {
@@ -62,17 +59,19 @@ fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
                     looking_for = 4; //change modes to explicitly empty only
                 }
 
+                flag(&ena, &enb, &counter);
+
                 //Look down the current row for occupied seats to the left
                 if enb.ne(&0) {
-                    let found_maybe = look_left(enb, r, looking_for);
+                    let found_maybe = look_left(enb, &active_layout[ena], looking_for);
                     counted += found_maybe;
-                    total_available += found_maybe;
+                    total_available += 1;
                 }
                 // and then to the right
                 if enb.ne(&row_length) {
-                    let found_maybe = look_right(enb, r, looking_for, row_length);
+                    let found_maybe = look_right(enb, &active_layout[ena], looking_for, row_length);
                     counted += found_maybe;
-                    total_available += found_maybe;
+                    total_available += 1;
                 }
 
                 if ena.ne(&0) {
@@ -165,13 +164,11 @@ fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
                 total_available = ta_reset;
             }
         }
+        active_layout = new_layout;
 
         //Write current grid to file
-        write_iter(new_layout.clone(), counter);
+        write_iter(active_layout.clone(), counter);
         counter += 1; // Since we'll be writing every iteration
-
-        // Since we are no longer iterating over active layout we can update it with the changes
-        active_layout = new_layout;
 
         //Finally, if there have been no changes from this round and last round
         // then count the number of occupied seats and break out of the loop
@@ -187,6 +184,16 @@ fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
         }
     }
     total_occupied
+}
+
+fn flag(ena: &usize, enb: &usize, counter: &usize) {
+    let row = 0;
+    let col = 1;
+    let itr: usize = 2;
+
+    if ena.eq(&row) && enb.eq(&col) && itr.eq(&counter) {
+        println!("Hooked!");
+    }
 }
 
 /*
@@ -310,7 +317,7 @@ fn find_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
 }
 
 // Find the first occurance of the seat you're looking for on the right
-fn look_right(enb: usize, r: &[u8], looking_for: u8, row_length: usize) -> i32 {
+fn look_right(enb: usize, r: &Vec<u8>, looking_for: u8, row_length: usize) -> i32 {
     let look_right = &r[enb + 1..=row_length];
     let look_len = look_right.len();
     let mut ret = 0;
@@ -328,7 +335,7 @@ fn look_right(enb: usize, r: &[u8], looking_for: u8, row_length: usize) -> i32 {
 }
 
 // Find the first occurance of the seat you're looking for on the left
-fn look_left(enb: usize, r: &[u8], looking_for: u8) -> i32 {
+fn look_left(enb: usize, r: &Vec<u8>, looking_for: u8) -> i32 {
     let mut look_left: Vec<usize> = (0..enb).collect();
     let look_len = look_left.len();
     let mut ret = 0;
@@ -362,23 +369,26 @@ fn look_diag(
     thresh: u8,
     inc: i32,
 ) -> i32 {
+    let mut dec = false;
     let mut ret = 0;
     let rng = if lb.gt(&rb) {
+        dec = true;
         RangeInclusive::new(rb, lb)
     } else {
         RangeInclusive::new(lb, rb)
     };
     let mut angle = ii;
-    for i in rng { 
-        if check_seat(al[i][angle], lf) == 1 {
+    for i in rng {
+        let cur_seat = al[i][angle].clone();
+        if check_seat(cur_seat, lf) == 1 {
             ret += 1;
             break;
-        } else if i.eq(&rb) && lf.eq(&4) {
-            ret += 1;
         }
-        // using threshold here (which is 5) 
+        // using threshold here (which is 5)
         // because check_seat with an LF of 5 looks for L and #
-        if check_seat(al[i][angle], thresh) == 1 {
+        if check_seat(cur_seat, thresh) == 1 
+        || (dec && i.eq(&0) || angle.eq(&0))
+        || (dec == false && i.eq(&(al.len() - 1) ) || angle.eq(&(al.len() - 1))) {
             break;
         }
         if inc.eq(&1) && angle.ne(&lb) && angle.ne(&rb) {
@@ -422,9 +432,9 @@ fn check_seat(seat: u8, l_f: u8) -> i32 {
     } else if l_f.eq(&4) {
         //I need an explicit open only
         ret = match seat {
-            b'L' => 1,
-            b'#' => 0,
-            _ => 0,
+            b'L' => 1, //76
+            b'#' => 0, //35
+            _ => 0, //46
         }
     } else if l_f.eq(&5) {
         //I need only seats
