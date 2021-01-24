@@ -4,7 +4,7 @@ use std::io::prelude::*;
 use std::io::{Error, LineWriter};
 use std::ops::RangeInclusive;
 
-pub fn execute_dayeleven() { //180 is too low
+pub fn execute_dayeleven() { //180 is too low for part 2
     let path = "./input/day11.txt";
     let working = prepare_input(path);
     let expected_occupied_seats = find_stable_occupied(working.clone());
