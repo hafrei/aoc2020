@@ -7,15 +7,36 @@ use std::fs;
 //    N = 0, W = 90, S = 180, E = 270 rotating left
 // but that's if you're facing N, is it not?
 
+struct Waypoint {
+    x: i32,
+    y: i32,
+}
+
 struct Ship {
     x: i32,
     y: i32,
     facing: u8,
 }
 
+#[derive(Clone)]
 struct Instruction {
     direction: u8, //This is a char
     distance: i32,
+}
+
+impl Instruction {
+  fn new(direction: u8, distance: i32) -> Self {
+      Self {
+          direction,
+          distance,
+      }
+  }
+}
+
+impl Waypoint {
+    fn new() -> Self {
+        Self { x: 10, y: 1 }
+    }
 }
 
 impl Ship {
@@ -23,7 +44,7 @@ impl Ship {
         Self {
             x: 0,
             y: 0,
-            facing: b'E', //this is problematic. Should have used an enum
+            facing: b'E',
         }
     }
     //Oh my god I love this. RECURSION! YEAH! :D
@@ -49,85 +70,79 @@ impl Ship {
                 _ => {}
             },
             b'S' => match adjust_to {
-              1 => self.facing = b'E',
-              2 => self.facing = b'N',
-              3 => self.facing = b'W',
-              _ => {}
-          },
+                1 => self.facing = b'E',
+                2 => self.facing = b'N',
+                3 => self.facing = b'W',
+                _ => {}
+            },
             b'E' => match adjust_to {
-              1 => self.facing = b'N',
-              2 => self.facing = b'W',
-              3 => self.facing = b'S',
-              _ => {}
-          },
+                1 => self.facing = b'N',
+                2 => self.facing = b'W',
+                3 => self.facing = b'S',
+                _ => {}
+            },
             b'W' => match adjust_to {
-              1 => self.facing = b'S',
-              2 => self.facing = b'E',
-              3 => self.facing = b'N',
-              _ => {}
-          },
+                1 => self.facing = b'S',
+                2 => self.facing = b'E',
+                3 => self.facing = b'N',
+                _ => {}
+            },
             _ => {}
         }
     }
-
     fn rotate_right(self: &mut Self, degree: i32) {
-      let adjust_to = degree / 90;
-      match self.facing {
-          b'N' => match adjust_to {
-              1 => self.facing = b'E',
-              2 => self.facing = b'S',
-              3 => self.facing = b'W',
-              _ => {}
-          },
-          b'S' => match adjust_to {
-            1 => self.facing = b'W',
-            2 => self.facing = b'N',
-            3 => self.facing = b'E',
+        let adjust_to = degree / 90;
+        match self.facing {
+            b'N' => match adjust_to {
+                1 => self.facing = b'E',
+                2 => self.facing = b'S',
+                3 => self.facing = b'W',
+                _ => {}
+            },
+            b'S' => match adjust_to {
+                1 => self.facing = b'W',
+                2 => self.facing = b'N',
+                3 => self.facing = b'E',
+                _ => {}
+            },
+            b'E' => match adjust_to {
+                1 => self.facing = b'S',
+                2 => self.facing = b'W',
+                3 => self.facing = b'N',
+                _ => {}
+            },
+            b'W' => match adjust_to {
+                1 => self.facing = b'N',
+                2 => self.facing = b'E',
+                3 => self.facing = b'S',
+                _ => {}
+            },
             _ => {}
-        },
-          b'E' => match adjust_to {
-            1 => self.facing = b'S',
-            2 => self.facing = b'W',
-            3 => self.facing = b'N',
-            _ => {}
-        },
-          b'W' => match adjust_to {
-            1 => self.facing = b'N',
-            2 => self.facing = b'E',
-            3 => self.facing = b'S',
-            _ => {}
-        },
-          _ => {}
-      }
-    }
-}
-
-impl Instruction {
-    fn new(direction: u8, distance: i32) -> Self {
-        Self {
-            direction,
-            distance,
         }
     }
 }
 
-pub fn execute_daytwelve() -> i32 {
-    let path = "./input/day12.txt";
+pub fn execute_daytwelve() -> (i32, i32) {
+    let path = "./input/day12test.txt";
     let working = prepare_input(path);
-    let destination = process_movement(working);
+    let destination = process_part1(working.clone());
     let manhattan_dist = destination.x.abs() + destination.y.abs();
-    println!("manhattan distance is {}", manhattan_dist);
-    manhattan_dist
+    println!("Manhattan distance is {}", manhattan_dist);
+    let waypoint_dist = process_part2(working);
+    let taxicab_waypoint = waypoint_dist.x.abs() + waypoint_dist.y.abs();
+    (manhattan_dist, taxicab_waypoint)
 }
 
-fn process_movement(instuct: Vec<Instruction>) -> Ship {
+fn process_part2(instuct: Vec<Instruction>) -> Ship {
+    let mut boat = Ship::new();
+    boat
+}
+
+fn process_part1(instuct: Vec<Instruction>) -> Ship {
     let mut boat = Ship::new();
     for x in instuct {
-        //println!(" Go {} for {}", &x.direction, &x.distance);
         boat.move_direction(x);
-        println!("Boat is at {}, {}, and faces {}", &boat.x, &boat.y, &boat.facing)
     }
-    println!("Arrived at {},{}", &boat.x, &boat.y);
     boat
 }
 

@@ -16,6 +16,8 @@ mod tests {
     use crate::daytwelve;
     #[test] //This only works if the test file is day12test.txt
     fn test_daytwelve() {
-        assert_eq!(25, daytwelve::execute_daytwelve());
+        let (part_one, part_two) = daytwelve::execute_daytwelve();
+        assert_eq!(25, part_one);
+        assert_eq!(286, part_two);
     }
 }
