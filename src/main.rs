@@ -2,7 +2,7 @@ use aoc2020::{
     dayone::execute_dayone, daytwo::execute_daytwo, daythree::execute_daythree,
     dayfour::execute_dayfour, dayfive::execute_dayfive, daysix::execute_daysix,
     dayseven::execute_dayseven, dayeight::execute_dayeight, daynine::execute_daynine,
-    dayten::execute_dayten, dayeleven::execute_dayeleven,
+    dayten::execute_dayten, dayeleven::execute_dayeleven, daytwelve::execute_daytwelve,
 };
 use std::time::SystemTime;
 
@@ -39,6 +39,9 @@ fn main() {
     runtime(start);
     let start = SystemTime::now();
     execute_dayeleven();
+    runtime(start);
+    let start = SystemTime::now();
+    execute_daytwelve();
     runtime(start);
 }
 

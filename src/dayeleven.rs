@@ -4,7 +4,8 @@ use std::io::prelude::*;
 use std::io::{Error, LineWriter};
 use std::ops::RangeInclusive;
 
-pub fn execute_dayeleven() { //180 is too low for part 2
+pub fn execute_dayeleven() {
+    //180 is too low for part 2
     let path = "./input/day11.txt";
     let working = prepare_input(path);
     let expected_occupied_seats = find_stable_occupied(working.clone());
@@ -167,7 +168,7 @@ fn find_real_stable_occupied(layout: Vec<Vec<u8>>) -> i32 {
         active_layout = new_layout;
 
         //Write current grid to file
-        write_iter(active_layout.clone(), counter);
+        write_iter(active_layout.clone(), counter).expect("Write function broke");
         counter += 1; // Since we'll be writing every iteration
 
         //Finally, if there have been no changes from this round and last round
@@ -386,9 +387,10 @@ fn look_diag(
         }
         // using threshold here (which is 5)
         // because check_seat with an LF of 5 looks for L and #
-        if check_seat(cur_seat, thresh) == 1 
-        || (dec && i.eq(&0) || angle.eq(&0))
-        || (dec == false && i.eq(&(al.len() - 1) ) || angle.eq(&(al.len() - 1))) {
+        if check_seat(cur_seat, thresh) == 1
+            || (dec && i.eq(&0) || angle.eq(&0))
+            || (dec == false && i.eq(&(al.len() - 1)) || angle.eq(&(al.len() - 1)))
+        {
             break;
         }
         if inc.eq(&1) && angle.ne(&lb) && angle.ne(&rb) {
@@ -434,7 +436,7 @@ fn check_seat(seat: u8, l_f: u8) -> i32 {
         ret = match seat {
             b'L' => 1, //76
             b'#' => 0, //35
-            _ => 0, //46
+            _ => 0,    //46
         }
     } else if l_f.eq(&5) {
         //I need only seats
@@ -461,10 +463,16 @@ fn write_iter(cm: Vec<Vec<u8>>, iter: usize) -> Result<(), Error> {
     let mut buffer = LineWriter::new(file);
 
     for c in cm {
-        buffer.write_all(&c);
-        buffer.write_all(b"\n");
+        buffer
+            .write_all(&c)
+            .expect("Write action in day eleven did not work");
+        buffer
+            .write_all(b"\n")
+            .expect("Write action in day eleven did not work");
     }
-    buffer.flush();
+    buffer
+        .flush()
+        .expect("Flush action in day eleven did not work");
     Ok(())
 }
 
