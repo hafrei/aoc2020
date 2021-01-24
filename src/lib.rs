@@ -14,8 +14,8 @@ pub mod daytwo;
 #[cfg(test)]
 mod tests {
     use crate::daytwelve;
-  #[test]
-  fn test_daytwelve() {
-      assert_eq!(25, daytwelve::execute_daytwelve());
-  }
+    #[test] //This only works if the test file is day12test.txt
+    fn test_daytwelve() {
+        assert_eq!(25, daytwelve::execute_daytwelve());
+    }
 }

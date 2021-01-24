@@ -23,7 +23,7 @@ impl Ship {
         Self {
             x: 0,
             y: 0,
-            facing: b'E', //this is problematic
+            facing: b'E', //this is problematic. Should have used an enum
         }
     }
     //Oh my god I love this. RECURSION! YEAH! :D
@@ -33,16 +33,72 @@ impl Ship {
             b'S' => self.x -= inst.distance,
             b'E' => self.y += inst.distance,
             b'W' => self.y -= inst.distance,
-            b'L' => self.rotate(inst.distance),
-            b'R' => self.rotate(inst.distance),
+            b'L' => self.rotate_left(inst.distance),
+            b'R' => self.rotate_right(inst.distance),
             b'F' => self.move_direction(Instruction::new(self.facing, inst.distance)),
             _ => panic!("Hoh baby, something went wrong in move_direciton"),
         }
     }
-    fn rotate(self: &mut Self, rotation: i32) {
-        match rotation {
+    fn rotate_left(self: &mut Self, degree: i32) {
+        let adjust_to = degree / 90;
+        match self.facing {
+            b'N' => match adjust_to {
+                1 => self.facing = b'W',
+                2 => self.facing = b'S',
+                3 => self.facing = b'E',
+                _ => {}
+            },
+            b'S' => match adjust_to {
+              1 => self.facing = b'E',
+              2 => self.facing = b'N',
+              3 => self.facing = b'W',
+              _ => {}
+          },
+            b'E' => match adjust_to {
+              1 => self.facing = b'N',
+              2 => self.facing = b'W',
+              3 => self.facing = b'S',
+              _ => {}
+          },
+            b'W' => match adjust_to {
+              1 => self.facing = b'S',
+              2 => self.facing = b'E',
+              3 => self.facing = b'N',
+              _ => {}
+          },
             _ => {}
         }
+    }
+
+    fn rotate_right(self: &mut Self, degree: i32) {
+      let adjust_to = degree / 90;
+      match self.facing {
+          b'N' => match adjust_to {
+              1 => self.facing = b'E',
+              2 => self.facing = b'S',
+              3 => self.facing = b'W',
+              _ => {}
+          },
+          b'S' => match adjust_to {
+            1 => self.facing = b'W',
+            2 => self.facing = b'N',
+            3 => self.facing = b'E',
+            _ => {}
+        },
+          b'E' => match adjust_to {
+            1 => self.facing = b'S',
+            2 => self.facing = b'W',
+            3 => self.facing = b'N',
+            _ => {}
+        },
+          b'W' => match adjust_to {
+            1 => self.facing = b'N',
+            2 => self.facing = b'E',
+            3 => self.facing = b'S',
+            _ => {}
+        },
+          _ => {}
+      }
     }
 }
 
@@ -56,19 +112,22 @@ impl Instruction {
 }
 
 pub fn execute_daytwelve() -> i32 {
-    let path = "./input/day12test.txt";
+    let path = "./input/day12.txt";
     let working = prepare_input(path);
     let destination = process_movement(working);
-    destination.x + destination.y
+    let manhattan_dist = destination.x.abs() + destination.y.abs();
+    println!("manhattan distance is {}", manhattan_dist);
+    manhattan_dist
 }
 
 fn process_movement(instuct: Vec<Instruction>) -> Ship {
     let mut boat = Ship::new();
     for x in instuct {
-        println!(" Go {} for {}", x.direction, x.distance);
+        //println!(" Go {} for {}", &x.direction, &x.distance);
         boat.move_direction(x);
+        println!("Boat is at {}, {}, and faces {}", &boat.x, &boat.y, &boat.facing)
     }
-    println!("Arrived at {},{}", boat.x, boat.y);
+    println!("Arrived at {},{}", &boat.x, &boat.y);
     boat
 }
 
