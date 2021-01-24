@@ -55,19 +55,21 @@ impl Instruction {
     }
 }
 
-pub fn execute_daytwelve() {
-    //going to move ahead before I lose track of this
+pub fn execute_daytwelve() -> i32 {
     let path = "./input/day12test.txt";
-    let working = prepare_input(path); //Ship starts facing east
-    process_movement(working);
+    let working = prepare_input(path);
+    let destination = process_movement(working);
+    destination.x + destination.y
 }
 
-fn process_movement(instuct: Vec<Instruction>) {
+fn process_movement(instuct: Vec<Instruction>) -> Ship {
     let mut boat = Ship::new();
     for x in instuct {
         println!(" Go {} for {}", x.direction, x.distance);
         boat.move_direction(x);
     }
+    println!("Arrived at {},{}", boat.x, boat.y);
+    boat
 }
 
 fn prepare_input(filepath: &str) -> Vec<Instruction> {

@@ -10,3 +10,12 @@ pub mod dayten;
 pub mod daythree;
 pub mod daytwelve;
 pub mod daytwo;
+
+#[cfg(test)]
+mod tests {
+    use crate::daytwelve;
+  #[test]
+  fn test_daytwelve() {
+      assert_eq!(25, daytwelve::execute_daytwelve());
+  }
+}
