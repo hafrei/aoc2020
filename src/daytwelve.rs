@@ -42,40 +42,78 @@ impl Waypoint {
     }
     fn rotate_left(self: &mut Self, degree: i32, ship_facing: u8) {
       let adjust_to = degree / 90;
-      match ship_facing {
-          b'N' => match adjust_to { // N -> W -> S -> E
-              1 => {}
-              2 => {
+      match ship_facing {             // N (-x, y) -> W (-x, -y) -> S (x, -y) -> E (x, y)
+          b'N' => match adjust_to {   // 
+              1 => {
                 let ty = self.y;
-                self.y = -ty;
+                self.y = -self.x;
+                self.x = -ty;
               }
-              3 => {}
+              2 => {
+                self.x = self.x.abs();
+                self.y = -self.y;
+              }
+              3 => {
+                let ty = self.y;
+                self.y = self.x.abs();
+                self.x = ty;
+              }
               _ => {}
           },
           b'S' => match adjust_to {
-            1 => {}
-            2 => {
+            1 => {
+              let tx = self.x; 
               let ty = self.y;
-              self.y = ty.abs();
+              self.y = tx.abs();
+              self.x = ty.abs();
             }
-            3 => {}
+            2 => {
+              self.y = self.y.abs();
+              self.x = -self.x;
+            }
+            3 => {
+              let tx = self.x; 
+              let ty = self.y;
+              self.y = -tx;
+              self.x = -ty;
+            }
             _ => {}
           },
           b'E' => match adjust_to {
-            1 => {}
-            2 => {              
+            1 => {
+              //turn left 90 degrees
+              let tx = self.x; 
+              let ty = self.y;
+              self.y = tx.abs();
+              self.x = -ty;
+            }
+            2 => {
+              self.x = -self.x;
+              self.y = -self.y;
+            }
+            3 => {
               let tx = self.x;
-              self.x = -tx;}
-            3 => {}
+              let ty = self.y;
+              self.y = -tx;
+              self.x = ty.abs();
+            }
             _ => {}
           },
           b'W' => match adjust_to {
-            1 => {}
-            2 => {
+            1 => {
               let tx = self.x;
-              self.x = tx.abs();
+              self.x = self.y.abs();
+              self.y = -tx;
             }
-            3 => {}
+            2 => {
+              self.x = self.x.abs();
+              self.y = self.y.abs();
+            }
+            3 => {
+              let tx = self.x;
+              self.x = -self.y;
+              self.y = tx.abs();
+            }
             _ => {}
           },
           _ => {}
@@ -86,16 +124,19 @@ impl Waypoint {
       match ship_facing {
           b'N' => match adjust_to {
               1 => {
-                let tx = self.x; 
                 let ty = self.y;
-                self.y = -tx;
+                self.y = self.x.abs();
                 self.x = ty;
               }
               2 => {
-                let ty = self.y;
-                self.y = -ty;
+                self.x = self.x.abs();
+                self.y = -self.y;
               }
-              3 => {}
+              3 => {
+                let ty = self.y;
+                self.y = -self.x;
+                self.x = -ty;
+              }
               _ => {}
           },
           b'S' => match adjust_to {
@@ -106,10 +147,15 @@ impl Waypoint {
               self.x = -ty;
             }
             2 => {
-              let ty = self.y;
-              self.y = ty.abs();
+              self.y = self.y.abs();
+              self.x = -self.x;
             }
-            3 => {}
+            3 => {
+              let tx = self.x; 
+              let ty = self.y;
+              self.y = tx.abs();
+              self.x = ty.abs();
+            }
             _ => {}
           },
           b'E' => match adjust_to {
@@ -121,8 +167,8 @@ impl Waypoint {
               self.x = ty.abs();
             }
             2 => {
-              let tx = self.x;
-              self.x = -tx;
+              self.x = -self.x;
+              self.y = -self.y;
             }
             3 => {
               let tx = self.x;
@@ -133,12 +179,20 @@ impl Waypoint {
             _ => {}
           },
           b'W' => match adjust_to {
-            1 => {}
-            2 => {
+            1 => {
               let tx = self.x;
-              self.x = tx.abs();
+              self.x = -self.y;
+              self.y = tx.abs();
             }
-            3 => {}
+            2 => {
+              self.x = self.x.abs();
+              self.y = self.y.abs();
+            }
+            3 => {
+              let tx = self.x;
+              self.x = self.y.abs();
+              self.y = -tx;
+            }
             _ => {}
           },
           _ => {}
@@ -256,9 +310,9 @@ impl Ship {
     }
 }
 
-// Entry point
+// Entry point; 158603 is too high
 pub fn execute_daytwelve() -> (i32, i32) {
-    let path = "./input/day12test.txt";
+    let path = "./input/day12.txt";
     let working = prepare_input(path);
     let destination = process_part1(working.clone());
     let manhattan_dist = destination.x.abs() + destination.y.abs();
