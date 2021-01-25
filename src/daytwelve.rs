@@ -8,8 +8,8 @@ use std::fs;
 // but that's if you're facing N, is it not?
 
 struct Waypoint {
-    x: i32,
-    y: i32,
+    x: i32, //Positive X = E, Negative X = W
+    y: i32, //Positive Y = N, Negative Y = S
 }
 
 struct Ship {
@@ -25,17 +25,124 @@ struct Instruction {
 }
 
 impl Instruction {
-  fn new(direction: u8, distance: i32) -> Self {
-      Self {
-          direction,
-          distance,
-      }
-  }
+    fn new(direction: u8, distance: i32) -> Self {
+        Self {
+            direction,
+            distance,
+        }
+    }
 }
 
 impl Waypoint {
     fn new() -> Self {
-        Self { x: 10, y: 1 }
+        Self { 
+          x: 10, //Positive X = E, Negative X = W
+          y: 1   //Positive Y = N, Negative Y = S
+        }
+    }
+    fn rotate_left(self: &mut Self, degree: i32, ship_facing: u8) {
+      let adjust_to = degree / 90;
+      match ship_facing {
+          b'N' => match adjust_to { // N -> W -> S -> E
+              1 => {}
+              2 => {
+                let ty = self.y;
+                self.y = -ty;
+              }
+              3 => {}
+              _ => {}
+          },
+          b'S' => match adjust_to {
+            1 => {}
+            2 => {
+              let ty = self.y;
+              self.y = ty.abs();
+            }
+            3 => {}
+            _ => {}
+          },
+          b'E' => match adjust_to {
+            1 => {}
+            2 => {              
+              let tx = self.x;
+              self.x = -tx;}
+            3 => {}
+            _ => {}
+          },
+          b'W' => match adjust_to {
+            1 => {}
+            2 => {
+              let tx = self.x;
+              self.x = tx.abs();
+            }
+            3 => {}
+            _ => {}
+          },
+          _ => {}
+      }
+    }
+    fn rotate_right(self: &mut Self, degree: i32, ship_facing: u8) {
+      let adjust_to = degree / 90;
+      match ship_facing {
+          b'N' => match adjust_to {
+              1 => {
+                let tx = self.x; 
+                let ty = self.y;
+                self.y = -tx;
+                self.x = ty;
+              }
+              2 => {
+                let ty = self.y;
+                self.y = -ty;
+              }
+              3 => {}
+              _ => {}
+          },
+          b'S' => match adjust_to {
+            1 => {
+              let tx = self.x; 
+              let ty = self.y;
+              self.y = -tx;
+              self.x = -ty;
+            }
+            2 => {
+              let ty = self.y;
+              self.y = ty.abs();
+            }
+            3 => {}
+            _ => {}
+          },
+          b'E' => match adjust_to {
+            1 => {
+              //turn right 90 degrees
+              let tx = self.x; 
+              let ty = self.y;
+              self.y = -tx;
+              self.x = ty.abs();
+            }
+            2 => {
+              let tx = self.x;
+              self.x = -tx;
+            }
+            3 => {
+              let tx = self.x;
+              let ty = self.y;
+              self.y = tx.abs();
+              self.x = -ty;
+            }
+            _ => {}
+          },
+          b'W' => match adjust_to {
+            1 => {}
+            2 => {
+              let tx = self.x;
+              self.x = tx.abs();
+            }
+            3 => {}
+            _ => {}
+          },
+          _ => {}
+      }
     }
 }
 
@@ -47,13 +154,40 @@ impl Ship {
             facing: b'E',
         }
     }
+
+    fn move_to_waypoint(self: &mut Self, wp: &mut Waypoint, inst: Instruction) {
+        match inst.direction {
+            b'N' => wp.y += inst.distance,
+            b'S' => wp.y -= inst.distance,
+            b'E' => wp.x += inst.distance,
+            b'W' => wp.x -= inst.distance,
+            b'L' => wp.rotate_left(inst.distance, self.facing),
+            b'R' => wp.rotate_right(inst.distance, self.facing),
+            b'F' => {
+                for _x in 0..inst.distance {
+                  if wp.y > 0 {
+                    self.move_direction(Instruction::new(b'N', wp.y.abs()))
+                  } else if wp.y < 0 {
+                    self.move_direction(Instruction::new(b'S', wp.y.abs()))
+                  }
+                  if wp.x > 0 {
+                    self.move_direction(Instruction::new(b'E', wp.x.abs()))
+                  } else if wp.x < 0 {
+                    self.move_direction(Instruction::new(b'W', wp.x.abs()))
+                  }
+                }
+            }
+            _ => panic!("Hoh baby, something went wrong in move_to_waypoint"),
+        }
+    }
+
     //Oh my god I love this. RECURSION! YEAH! :D
     fn move_direction(self: &mut Self, inst: Instruction) {
         match inst.direction {
-            b'N' => self.x += inst.distance,
-            b'S' => self.x -= inst.distance,
-            b'E' => self.y += inst.distance,
-            b'W' => self.y -= inst.distance,
+            b'N' => self.y += inst.distance,
+            b'S' => self.y -= inst.distance,
+            b'E' => self.x += inst.distance,
+            b'W' => self.x -= inst.distance,
             b'L' => self.rotate_left(inst.distance),
             b'R' => self.rotate_right(inst.distance),
             b'F' => self.move_direction(Instruction::new(self.facing, inst.distance)),
@@ -135,6 +269,10 @@ pub fn execute_daytwelve() -> (i32, i32) {
 
 fn process_part2(instuct: Vec<Instruction>) -> Ship {
     let mut boat = Ship::new();
+    let mut waypoint = Waypoint::new();
+    for x in instuct {
+        boat.move_to_waypoint(&mut waypoint, x);
+    }
     boat
 }
 

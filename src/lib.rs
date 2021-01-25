@@ -20,4 +20,8 @@ mod tests {
         assert_eq!(25, part_one);
         assert_eq!(286, part_two);
     }
+    #[test]
+    fn name() {
+        assert_eq!(-1 * -1, 1);
+    }
 }
