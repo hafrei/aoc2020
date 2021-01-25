@@ -256,6 +256,7 @@ impl Ship {
     }
 }
 
+// Entry point
 pub fn execute_daytwelve() -> (i32, i32) {
     let path = "./input/day12test.txt";
     let working = prepare_input(path);
@@ -264,6 +265,7 @@ pub fn execute_daytwelve() -> (i32, i32) {
     println!("Manhattan distance is {}", manhattan_dist);
     let waypoint_dist = process_part2(working);
     let taxicab_waypoint = waypoint_dist.x.abs() + waypoint_dist.y.abs();
+    println!("Manhattan distance using waypoints is {}", taxicab_waypoint);
     (manhattan_dist, taxicab_waypoint)
 }
 
