@@ -58,7 +58,7 @@ impl Waypoint {
             y: 1,  //Positive Y = N, Negative Y = S
         }
     }
-    fn rotate_left(self: &mut Self, degree: i32, ship_facing: &mut u8) {
+    fn rotate_left(&mut self, degree: i32, ship_facing: &mut u8) {
         let adjust_to = degree / 90;
         match ship_facing {
             // N (-x, y) -> W (-x, -y) -> S (x, -y) -> E (x, y)
@@ -151,7 +151,7 @@ impl Waypoint {
             _ => {}
         }
     }
-    fn rotate_right(self: &mut Self, degree: i32, ship_facing: &mut u8) {
+    fn rotate_right(&mut self, degree: i32, ship_facing: &mut u8) {
         let adjust_to = degree / 90;
         match ship_facing {
             b'N' => match adjust_to {
@@ -253,7 +253,7 @@ impl Ship {
         }
     }
 
-    fn move_to_waypoint(self: &mut Self, wp: &mut Waypoint, inst: Instruction) {
+    fn move_to_waypoint(&mut self, wp: &mut Waypoint, inst: Instruction) {
         match inst.direction {
             b'N' => wp.y += inst.distance,
             b'S' => wp.y -= inst.distance,
@@ -280,7 +280,7 @@ impl Ship {
     }
 
     //Oh my god I love this. RECURSION! YEAH! :D
-    fn move_direction(self: &mut Self, inst: Instruction) {
+    fn move_direction(&mut self, inst: Instruction) {
         match inst.direction {
             b'N' => self.y += inst.distance,
             b'S' => self.y -= inst.distance,
@@ -292,7 +292,7 @@ impl Ship {
             _ => panic!("Hoh baby, something went wrong in move_direciton"),
         }
     }
-    fn rotate_left(self: &mut Self, degree: i32) {
+    fn rotate_left(&mut self, degree: i32) {
         let adjust_to = degree / 90;
         match self.facing {
             b'N' => match adjust_to {
@@ -322,7 +322,7 @@ impl Ship {
             _ => {}
         }
     }
-    fn rotate_right(self: &mut Self, degree: i32) {
+    fn rotate_right(&mut self, degree: i32) {
         let adjust_to = degree / 90;
         match self.facing {
             b'N' => match adjust_to {
